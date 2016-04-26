@@ -1,0 +1,13 @@
+# use implicit smaximov/nodejs image specified by the runner
+
+cache:
+  key: "$CI_BUILD_REF_NAME"
+  paths:
+    - node_modules/
+
+test:
+  script:
+    - npm install
+    - npm test
+  tags:
+    - nodejs
