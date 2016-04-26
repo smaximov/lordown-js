@@ -1,0 +1,22 @@
+{
+  "name": "lordown",
+  "version": "0.1.0",
+  "description": "Markdown to LORCODE converter",
+  "main": "''",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh://git@gitlab.com/smaximov/lordown.git"
+  },
+  "author": "smaximov <s.b.maximov@gmail.com>",
+  "license": "Unlicense",
+  "bugs": {
+    "url": "https://gitlab.com/smaximov/lordown/issues"
+  },
+  "homepage": "https://gitlab.com/smaximov/lordown#README",
+  "dependencies": {
+    "markdown-it": "^6.0.1"
+  }
+}

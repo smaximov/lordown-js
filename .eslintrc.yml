@@ -1,0 +1,19 @@
+rules:
+  linebreak-style:
+    - 2
+    - unix
+  no-undef:
+    - 2
+    - typeof: true
+  no-mixed-spaces-and-tabs:
+    - 0
+  no-console:
+    - 1
+  no-unused-vars:
+    - 2
+    - varsIgnorePattern: "^_"
+      argsIgnorePattern: "^_"
+env:
+  node: true
+  es6: true
+extends: 'eslint:recommended'

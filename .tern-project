@@ -1,0 +1,13 @@
+{
+  "ecmaVersion": 6,
+  "libs": [
+  ],
+  "loadEagerly": [
+    "*.js"
+  ],
+  "plugins": {
+    "doc_comment": {},
+    "node": {},
+    "node_modules": {}
+  }
+}
