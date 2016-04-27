@@ -4,7 +4,8 @@
   "description": "Markdown to LORCODE converter",
   "main": "./src/index.js",
   "scripts": {
-    "test": "mocha --ui bdd --require ./test/helper.js 'test/**/test_*.js'"
+    "gulp": "gulp",
+    "test": "gulp test"
   },
   "repository": {
     "type": "git",
@@ -22,6 +23,8 @@
   },
   "devDependencies": {
     "chai": "^3.5.0",
+    "gulp": "^3.9.1",
+    "gulp-mocha": "^2.2.0",
     "mocha": "^2.4.5"
   }
 }
