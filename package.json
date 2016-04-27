@@ -17,7 +17,8 @@
   },
   "homepage": "https://gitlab.com/smaximov/lordown#README",
   "dependencies": {
-    "markdown-it": "^6.0.1"
+    "markdown-it": "^6.0.1",
+    "markdown-it-container": "^2.0.0"
   },
   "devDependencies": {
     "chai": "^3.5.0",

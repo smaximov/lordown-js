@@ -109,4 +109,12 @@ describe('Lordown', () => {
     expect(converter.convert('user@example.com'))
       .to.be.equal('[url=mailto:user@example.com]user@example.com[/url]\n\n')
   })
+
+  it('should render cuts', () => {
+    expect(converter.convert(':::\ncut contents\n:::'))
+      .to.be.equal('[cut]cut contents\n\n[/cut]')
+
+    expect(converter.convert('::: cut summary\ncut contents\n:::'))
+      .to.be.equal('[cut=cut summary]cut contents\n\n[/cut]')
+  })
 })

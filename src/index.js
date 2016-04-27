@@ -16,6 +16,8 @@ class Lordown {
       html: true,
       typographer: true,
       linkify: true
+    }).use(require('markdown-it-container'), 'cut', {
+      validate: () => true
     })
 
     this.md.renderer = new LordownRenderer

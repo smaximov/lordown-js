@@ -44,6 +44,11 @@ class LordownRenderer extends Renderer {
     this.addTag('bullet_list', '[list]', '[/list]')
     this.addTag('list_item', '[*]', '')
     this.addTag('link', (tokens, idx) => `[url=${tokens[idx].getAttr('href')}]`, '[/url]')
+    this.addTag('container_cut', (tokens, idx) => {
+      const info = tokens[idx].info.trim()
+      const cutSummary = info.length > 0 ? `=${info}` : ''
+      return `[cut${cutSummary}]`
+    }, '[/cut]')
   }
 
   /**
