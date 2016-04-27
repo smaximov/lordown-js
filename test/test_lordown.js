@@ -100,4 +100,13 @@ describe('Lordown', () => {
   it('should render ~~text~~ as [s]text[/s]', () => {
     expect(converter.convert('~~text~~')).to.be.equal('[s]text[/s]\n\n')
   })
+
+  it('should render @maxcom as [user]maxcom[/user]', () => {
+    expect(converter.convert('@maxcom')).to.be.equal('[user]maxcom[/user]\n\n')
+  })
+
+  it('should distinguish email addresses from user mentions', () => {
+    expect(converter.convert('user@example.com'))
+      .to.be.equal('[url=mailto:user@example.com]user@example.com[/url]\n\n')
+  })
 })
