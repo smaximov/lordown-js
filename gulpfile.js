@@ -1,5 +1,6 @@
 'use strict';
 
+const babelify = require('babelify')
 const browserify = require('browserify')
 const concat = require('gulp-concat')
 const gulp = require('gulp')
@@ -34,7 +35,9 @@ gulp.task('meta', () => {
 })
 
 gulp.task('bundle', () => {
-  return browserify('./userscript/index.js').bundle()
+  return browserify('./userscript/index.js')
+    .transform(babelify, { presets: ["es2015"] })
+    .bundle()
     .pipe(source('bundle.js'))
     .pipe(gulp.dest('./dist/'))
 })
