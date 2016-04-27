@@ -1,6 +1,6 @@
 'use strict';
 
-const Lordown = require('../src')
+const Lordown = require('../lib')
 
 describe('Lordown', () => {
   const converter = new Lordown

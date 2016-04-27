@@ -2,7 +2,7 @@
   "name": "lordown",
   "version": "0.1.0",
   "description": "Markdown to LORCODE converter",
-  "main": "./src/index.js",
+  "main": "./lib/index.js",
   "scripts": {
     "gulp": "gulp",
     "test": "gulp test"
