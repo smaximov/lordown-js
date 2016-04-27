@@ -1,5 +1,9 @@
 'use strict';
 
+const MarkdownIt = require('markdown-it')
+
+const LordownRenderer = require('./renderer')
+
 /**
  * Markdown to LORCODE converter.
  */
@@ -8,6 +12,13 @@ class Lordown {
    * Create a new instance of {@link Lordown}.
    */
   constructor() {
+    this.md = new MarkdownIt({
+      html: true,
+      typographer: true,
+      linkify: true
+    })
+
+    this.md.renderer = new LordownRenderer
   }
 
   /**
@@ -17,7 +28,14 @@ class Lordown {
    * @return {string}
    */
   convert(input) {
-    return input
+    return this.md.render(input)
+  }
+
+  /**
+   * Parse Markdown into a token stream (for debugging only).
+   */
+  parse(input) {
+    return this.md.parse(input)
   }
 }
 
