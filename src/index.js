@@ -18,7 +18,7 @@ class Lordown {
       linkify: true
     }).use(require('markdown-it-container'), 'cut', {
       validate: () => true
-    })
+    }).use(require('./mention'))
 
     this.md.renderer = new LordownRenderer
   }

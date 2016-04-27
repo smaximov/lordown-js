@@ -34,6 +34,7 @@ class LordownRenderer extends Renderer {
 
       return `${openTag}${token.content}[/code]\n`
     }
+    this.rules['mention'] = (tokens, idx) => `[user]${tokens[idx].content}[/user]`
 
     this.addTag('paragraph', '', '\n\n')
     this.addTag('strong', '[strong]', '[/strong]')

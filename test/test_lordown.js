@@ -101,8 +101,10 @@ describe('Lordown', () => {
     expect(converter.convert('~~text~~')).to.be.equal('[s]text[/s]\n\n')
   })
 
-  it('should render @maxcom as [user]maxcom[/user]', () => {
+  it('should render user mentions', () => {
     expect(converter.convert('@maxcom')).to.be.equal('[user]maxcom[/user]\n\n')
+    expect(converter.convert('preceding @user1 text @user2 trailing'))
+      .to.be.equal('preceding [user]user1[/user] text [user]user2[/user] trailing\n\n')
   })
 
   it('should distinguish email addresses from user mentions', () => {
