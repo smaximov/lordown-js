@@ -22,9 +22,12 @@
     "markdown-it-container": "^2.0.0"
   },
   "devDependencies": {
+    "browserify": "^13.0.0",
     "chai": "^3.5.0",
     "gulp": "^3.9.1",
+    "gulp-concat": "^2.6.0",
     "gulp-mocha": "^2.2.0",
-    "mocha": "^2.4.5"
+    "mocha": "^2.4.5",
+    "vinyl-source-stream": "^1.1.0"
   }
 }
