@@ -48,6 +48,12 @@ function init(form) {
     handle(previewButton, 'mousedown', convert)
   }
 
+  handle(markdownMsg, 'keydown', (event) => {
+    if (event.keyCode === 13 && event.ctrlKey) {
+      convert()
+    }
+  })
+
   handle(form, 'submit', convert)
 }
 
