@@ -8103,6 +8103,10 @@ module.exports=/[\0-\uD7FF\uDC00-\uFFFF]|[\uD800-\uDBFF][\uDC00-\uDFFF]|[\uD800-
 },{}],72:[function(require,module,exports){
 'use strict';
 
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
 var Lordown = require('../lib');
 var lordown = new Lordown();
 
@@ -8155,6 +8159,48 @@ function clone(node) {
   return result;
 }
 
+var ToggleButton = function () {
+  function ToggleButton(initialState, caption, onToggle) {
+    var _this = this;
+
+    _classCallCheck(this, ToggleButton);
+
+    this._enabled = initialState;
+    this._element = document.createElement('a');
+    this._element.textContent = caption;
+    this._element.classList.add('lordown-button');
+
+    handle(this._element, 'click', function () {
+      _this._enabled = !_this._enabled;
+      _this._element.classList.toggle('lordown-button-disabled');
+      onToggle(_this._enabled);
+    });
+  }
+
+  _createClass(ToggleButton, [{
+    key: 'appendTo',
+    value: function appendTo(parent) {
+      parent.appendChild(this._element);
+    }
+  }, {
+    key: 'enabled',
+    get: function get() {
+      return this._enabled;
+    }
+  }, {
+    key: 'element',
+    get: function get() {
+      return this._element;
+    }
+  }]);
+
+  return ToggleButton;
+}();
+
+function setVisible(element, visible) {
+  element.style.display = visible ? 'inline-block' : 'none';
+}
+
 function init(form) {
   if (form === null) return;
 
@@ -8169,8 +8215,17 @@ function init(form) {
   msg.parentNode.insertBefore(markdownMsg, msg);
   msg.style.display = 'none';
 
+  // Button to toggle lordown on/off
+  var lordownButton = new ToggleButton(true, 'Lordown', function (enabled) {
+    setVisible(msg, !enabled);
+    setVisible(markdownMsg, enabled);
+  });
+  lordownButton.appendTo(form.querySelector('label[for=' + msg.name + ']'));
+
   var convert = function convert() {
-    msg.value = lordown.convert(markdownMsg.value);
+    if (lordownButton.enabled) {
+      msg.value = lordown.convert(markdownMsg.value);
+    }
   };
 
   // Async previews use XHR instead of submit
@@ -8189,7 +8244,14 @@ function init(form) {
   handle(form, 'submit', convert);
 }
 
+var css = '\n.lordown-button {\n  cursor: pointer;\n  margin-left: .5em;\n  text-decoration: underline;\n}\n\n.lordown-button-disabled {\n  text-decoration: line-through;\n}\n';
+
 handle(window, 'load', function () {
+  var style = document.createElement('style');
+  style.type = 'text/css';
+  style.innerHTML = css;
+  document.documentElement.appendChild(style);
+
   init(choice('commentForm', 'messageForm'));
 });
 

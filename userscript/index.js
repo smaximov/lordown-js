@@ -23,6 +23,37 @@ function clone(node, updateAttr={}) {
   return result
 }
 
+class ToggleButton {
+  constructor(initialState, caption, onToggle) {
+    this._enabled = initialState
+    this._element = document.createElement('a')
+    this._element.textContent = caption
+    this._element.classList.add('lordown-button')
+
+    handle(this._element, 'click', () => {
+      this._enabled = !this._enabled
+      this._element.classList.toggle('lordown-button-disabled')
+      onToggle(this._enabled)
+    })
+  }
+
+  get enabled() {
+    return this._enabled
+  }
+
+  get element() {
+    return this._element
+  }
+
+  appendTo(parent) {
+    parent.appendChild(this._element)
+  }
+}
+
+function setVisible(element, visible) {
+  element.style.display = visible ? 'inline-block' : 'none'
+}
+
 function init(form) {
   if (form === null) return
 
@@ -37,8 +68,17 @@ function init(form) {
   msg.parentNode.insertBefore(markdownMsg, msg)
   msg.style.display = 'none'
 
+  // Button to toggle lordown on/off
+  const lordownButton = new ToggleButton(true, 'Lordown', (enabled) => {
+    setVisible(msg, !enabled)
+    setVisible(markdownMsg, enabled)
+  })
+  lordownButton.appendTo(form.querySelector(`label[for=${msg.name}]`))
+
   const convert = () => {
-    msg.value = lordown.convert(markdownMsg.value)
+    if (lordownButton.enabled) {
+      msg.value = lordown.convert(markdownMsg.value)
+    }
   }
 
   // Async previews use XHR instead of submit
@@ -57,6 +97,23 @@ function init(form) {
   handle(form, 'submit', convert)
 }
 
+const css = `
+.lordown-button {
+  cursor: pointer;
+  margin-left: .5em;
+  text-decoration: underline;
+}
+
+.lordown-button-disabled {
+  text-decoration: line-through;
+}
+`
+
 handle(window, 'load', () => {
+  const style = document.createElement('style')
+  style.type = 'text/css'
+  style.innerHTML = css
+  document.documentElement.appendChild(style)
+
   init(choice('commentForm', 'messageForm'))
 })
