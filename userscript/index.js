@@ -1,15 +1,62 @@
 const Lordown = require('../lib')
 const lordown = new Lordown
 
-function handle(element, event, handler) {
-  element.addEventListener(event, handler, false)
+// https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Testing_for_support_vs_availability
+function storageAvailable(type) {
+  try {
+    const storage = window[type]
+    const x = '__storage_test__'
+    storage.setItem(x, x)
+    storage.removeItem(x)
+    return true
+  }
+  catch(e) {
+    return false
+  }
+}
+
+// Execute `localStorage.setItem('lordown.debug', 'true')` in the browser console
+// to enable debug logging.
+function debugEnabled() {
+  return storageAvailable('localStorage') &&
+    localStorage.getItem('lordown.debug') === 'true'
+}
+
+function debug(what, ...args) {
+  if (debugEnabled()) {
+    console.debug('lordown ::', `${what} ::`, ...args) // eslint-disable-line no-console
+  }
+}
+
+function handle(element, event, handler, options={}) {
+  const doHandle = typeof options.when === 'function' ? options.when : () => true
+  const doLog = typeof options.log === 'boolean' ? options.log : true
+
+  if (doLog) {
+    debug('handle', `add '${event}' event listener for`, element)
+  }
+
+  element.addEventListener(event, (e) => {
+    if (doHandle(e)) {
+      if (doLog) {
+        debug('handle', `handle '${event}' event for`,  element)
+      }
+      return handler(e)
+    }
+    return undefined
+  }, false)
 }
 
 function choice(...ids) {
   for (let id of ids) {
     let result = document.getElementById(id)
-    if (result !== null) return result
+    if (result !== null) {
+      debug('choice', `found an element with the id '${id}'`)
+      return result
+    }
   }
+
+  debug('choice', `no elements found with ids [${ids.join(', ')}]`)
 
   return null
 }
@@ -55,10 +102,16 @@ function setVisible(element, visible) {
 }
 
 function init(form) {
-  if (form === null) return
+  if (form === null) {
+    debug('init', 'comment form not found')
+    return
+  }
 
   const msg = choice('msg', 'form_msg')
-  if (msg === null) return
+  if (msg === null) {
+    debug('init', 'comment textarea not found')
+    return
+  }
 
   const markdownMsg = clone(msg, {
     id: 'lordown-msg',
@@ -70,6 +123,8 @@ function init(form) {
 
   // Button to toggle lordown on/off
   const lordownButton = new ToggleButton(true, 'Lordown', (enabled) => {
+    debug('toggle', `lordown is ${enabled ? 'enabled' : 'disabled'}`)
+
     setVisible(msg, !enabled)
     setVisible(markdownMsg, enabled)
   })
@@ -77,6 +132,7 @@ function init(form) {
 
   const convert = () => {
     if (lordownButton.enabled) {
+      debug('convert', 'markdown -> lorcode')
       msg.value = lordown.convert(markdownMsg.value)
     }
   }
@@ -88,9 +144,9 @@ function init(form) {
     handle(previewButton, 'mousedown', convert)
   }
 
-  handle(markdownMsg, 'keydown', (event) => {
-    if (event.keyCode === 13 && event.ctrlKey) {
-      convert()
+  handle(markdownMsg, 'keydown', convert, {
+    when(event) {
+      return event.keyCode === 13 && event.ctrlKey
     }
   })
 
@@ -116,4 +172,6 @@ handle(window, 'load', () => {
   document.documentElement.appendChild(style)
 
   init(choice('commentForm', 'messageForm'))
+}, {
+  log: false
 })

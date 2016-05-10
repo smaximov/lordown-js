@@ -8101,13 +8101,63 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 var Lordown = require('../lib');
 var lordown = new Lordown();
 
+// https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Testing_for_support_vs_availability
+function storageAvailable(type) {
+  try {
+    var storage = window[type];
+    var x = '__storage_test__';
+    storage.setItem(x, x);
+    storage.removeItem(x);
+    return true;
+  } catch (e) {
+    return false;
+  }
+}
+
+// Execute `localStorage.setItem('lordown.debug', 'true')` in the browser console
+// to enable debug logging.
+function debugEnabled() {
+  return storageAvailable('localStorage') && localStorage.getItem('lordown.debug') === 'true';
+}
+
+function debug(what) {
+  if (debugEnabled()) {
+    var _console;
+
+    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    (_console = console).debug.apply(_console, ['lordown ::', what + ' ::'].concat(args)); // eslint-disable-line no-console
+  }
+}
+
 function handle(element, event, handler) {
-  element.addEventListener(event, handler, false);
+  var options = arguments.length <= 3 || arguments[3] === undefined ? {} : arguments[3];
+
+  var doHandle = typeof options.when === 'function' ? options.when : function () {
+    return true;
+  };
+  var doLog = typeof options.log === 'boolean' ? options.log : true;
+
+  if (doLog) {
+    debug('handle', 'add \'' + event + '\' event listener for', element);
+  }
+
+  element.addEventListener(event, function (e) {
+    if (doHandle(e)) {
+      if (doLog) {
+        debug('handle', 'handle \'' + event + '\' event for', element);
+      }
+      return handler(e);
+    }
+    return undefined;
+  }, false);
 }
 
 function choice() {
-  for (var _len = arguments.length, ids = Array(_len), _key = 0; _key < _len; _key++) {
-    ids[_key] = arguments[_key];
+  for (var _len2 = arguments.length, ids = Array(_len2), _key2 = 0; _key2 < _len2; _key2++) {
+    ids[_key2] = arguments[_key2];
   }
 
   var _iteratorNormalCompletion = true;
@@ -8119,7 +8169,10 @@ function choice() {
       var id = _step.value;
 
       var result = document.getElementById(id);
-      if (result !== null) return result;
+      if (result !== null) {
+        debug('choice', 'found an element with the id \'' + id + '\'');
+        return result;
+      }
     }
   } catch (err) {
     _didIteratorError = true;
@@ -8135,6 +8188,8 @@ function choice() {
       }
     }
   }
+
+  debug('choice', 'no elements found with ids [' + ids.join(', ') + ']');
 
   return null;
 }
@@ -8193,10 +8248,16 @@ function setVisible(element, visible) {
 }
 
 function init(form) {
-  if (form === null) return;
+  if (form === null) {
+    debug('init', 'comment form not found');
+    return;
+  }
 
   var msg = choice('msg', 'form_msg');
-  if (msg === null) return;
+  if (msg === null) {
+    debug('init', 'comment textarea not found');
+    return;
+  }
 
   var markdownMsg = clone(msg, {
     id: 'lordown-msg',
@@ -8208,6 +8269,8 @@ function init(form) {
 
   // Button to toggle lordown on/off
   var lordownButton = new ToggleButton(true, 'Lordown', function (enabled) {
+    debug('toggle', 'lordown is ' + (enabled ? 'enabled' : 'disabled'));
+
     setVisible(msg, !enabled);
     setVisible(markdownMsg, enabled);
   });
@@ -8215,6 +8278,7 @@ function init(form) {
 
   var convert = function convert() {
     if (lordownButton.enabled) {
+      debug('convert', 'markdown -> lorcode');
       msg.value = lordown.convert(markdownMsg.value);
     }
   };
@@ -8226,9 +8290,9 @@ function init(form) {
     handle(previewButton, 'mousedown', convert);
   }
 
-  handle(markdownMsg, 'keydown', function (event) {
-    if (event.keyCode === 13 && event.ctrlKey) {
-      convert();
+  handle(markdownMsg, 'keydown', convert, {
+    when: function when(event) {
+      return event.keyCode === 13 && event.ctrlKey;
     }
   });
 
@@ -8244,6 +8308,8 @@ handle(window, 'load', function () {
   document.documentElement.appendChild(style);
 
   init(choice('commentForm', 'messageForm'));
+}, {
+  log: false
 });
 
 },{"../lib":1}]},{},[72]);
