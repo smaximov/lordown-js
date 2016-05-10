@@ -112,6 +112,12 @@ describe('Lordown', () => {
       .to.be.equal('[url=mailto:user@example.com]user@example.com[/url]\n\n')
   })
 
+  it('should ignore mention-like syntax inside code blocks', () => {
+    expect(converter.convert('`@foo`')).to.be.equal('[inline]@foo[/inline]\n\n')
+    expect(converter.convert('```\n@foo\n```'))
+      .to.be.equal('[code]@foo\n[/code]\n')
+  })
+
   it('should render cuts', () => {
     expect(converter.convert(':::\ncut contents\n:::'))
       .to.be.equal('[cut]cut contents\n\n[/cut]')
