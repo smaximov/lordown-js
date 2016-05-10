@@ -55,3 +55,7 @@ gulp.task('test', () => {
       require: ['./test/helper.js']
     }))
 })
+
+gulp.task('watch', ['test'], () => {
+  return gulp.watch('lib/*.js', ['test'])
+})
