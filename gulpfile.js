@@ -6,6 +6,7 @@ const concat = require('gulp-concat')
 const gulp = require('gulp')
 const mocha = require('gulp-mocha')
 const source = require('vinyl-source-stream')
+const yargs = require('yargs')
 
 const pkg = require('./package.json')
 
@@ -52,7 +53,8 @@ gulp.task('test', () => {
   return gulp.src('test/**/test_*.js')
     .pipe(mocha({
       ui: 'bdd',
-      require: ['./test/helper.js']
+      require: ['./test/helper.js'],
+      grep: yargs.argv.grep
     }))
 })
 
