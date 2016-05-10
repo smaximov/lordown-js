@@ -56,6 +56,6 @@ gulp.task('test', () => {
     }))
 })
 
-gulp.task('watch', ['test'], () => {
+gulp.task('watch', () => {
   return gulp.watch('lib/*.js', ['test'])
 })
