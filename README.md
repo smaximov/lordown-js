@@ -42,7 +42,10 @@ Lordown &mdash; пользовательский скрипт для преоб�
     ```
 
 Кроме того, текст, похожий на ссылку, автоматически оборачивается в LORCODE-тег `[url]`:
-`https://youtu.be/dQw4w9WgXcQ` превращается в `[url=https://youtu.be/dQw4w9WgXcQ]https://youtu.be/dQw4w9WgXcQ[/url]`.
+`https://youtu.be/dQw4w9WgXcQ` (или `<https://youtu.be/dQw4w9WgXcQ>`)
+превращается в `[url=https://youtu.be/dQw4w9WgXcQ]https://youtu.be/dQw4w9WgXcQ[/url]`,
+а `user@example.com` (или `<user@example.com>`) &mdash; в
+`[url=mailto:user@example.com]user@example.com[/url]`.
 
 ### Ссылка на профиль пользователя (каст)
 
