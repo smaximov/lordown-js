@@ -1,3 +1,4 @@
 *.log
 .tern-port
 node_modules/
+dist/bundle.js
