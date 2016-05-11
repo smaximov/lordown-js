@@ -107,6 +107,12 @@ describe('Lordown', () => {
       .to.be.equal('preceding [user]user1[/user] text [user]user2[/user] trailing\n\n')
   })
 
+  it('should render mentions for usernames with underscores', () => {
+  //  expect(converter.convert('@user_with_underscores'))
+  //    .to.be.equal('[user]user_with_underscores[/user]\n\n')
+    expect(converter.convert('@_user_')).to.be.equal('[user]_user_[/user]\n\n')
+  })
+
   it('should distinguish email addresses from user mentions', () => {
     expect(converter.convert('user@example.com'))
       .to.be.equal('[url=mailto:user@example.com]user@example.com[/url]\n\n')
