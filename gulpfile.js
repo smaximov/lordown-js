@@ -2,6 +2,7 @@
 
 const babelify = require('babelify')
 const browserify = require('browserify')
+const eslint = require('gulp-eslint')
 const concat = require('gulp-concat')
 const gulp = require('gulp')
 const mocha = require('gulp-mocha')
@@ -58,8 +59,15 @@ gulp.task('test', () => {
     }))
 })
 
-gulp.task('watch', () => {
-  return gulp.watch(['lib/**/*.js', 'test/**/*.js'], ['test'])
+gulp.task('lint', () => {
+  return gulp.src(['**/*.js', '!node_modules/**', '!dist/**'])
+    .pipe(eslint())
+    .pipe(eslint.format())
+    .pipe(eslint.failAfterError())
 })
 
-gulp.task('default', ['watch', 'test'])
+gulp.task('watch', () => {
+  return gulp.watch(['lib/**/*.js', 'test/**/*.js'], ['test', 'lint'])
+})
+
+gulp.task('default', ['watch', 'test', 'lint'])
