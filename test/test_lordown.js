@@ -152,5 +152,16 @@ describe('Lordown', () => {
           .to.be.equal(`pre [${tag}]text[/${tag}] post\n\n`)
       }
     })
+
+    it('parse LORCODE tags with parameters', () => {
+      const tags = [
+        'list', 'quote', 'cut',
+      ]
+
+      for (let tag of tags) {
+        expect(converter.convert(`pre [${tag}=_parameter_]text[/${tag} post]`))
+          .to.be.equal(`pre [${tag}=_parameter_]text[/${tag} post]\n\n`)
+      }
+    })
   })
 })

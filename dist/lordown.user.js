@@ -102,7 +102,19 @@ module.exports = Lordown;
 },{"./cut":1,"./lorcode":3,"./mention":4,"./renderer":5,"markdown-it":11}],3:[function(require,module,exports){
 'use strict';
 
-var tagRe = /^\[\*\]/;
+var _templateObject = _taggedTemplateLiteral(['(?:/?(?:', ')(=[^]]*)?)|*'], ['(?:/?(?:', ')(=[^\\]]*)?)|\\*']),
+    _templateObject2 = _taggedTemplateLiteral(['^[(?:', ')]'], ['^\\[(?:', ')\\]']);
+
+function _taggedTemplateLiteral(strings, raw) { return Object.freeze(Object.defineProperties(strings, { raw: { value: Object.freeze(raw) } })); }
+
+var tags = ['s', 'u', 'b', 'i', 'em', 'strong', 'list', 'quote', 'cut'];
+
+function createTagRe(tags) {
+  var reSrc = String.raw(_templateObject, tags.join('|'));
+  return new RegExp(String.raw(_templateObject2, reSrc));
+}
+
+var tagRe = createTagRe(tags);
 
 var splitter = require('./splitter.js');
 
