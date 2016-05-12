@@ -2,6 +2,14 @@
 
 Lordown &mdash; пользовательский скрипт для преобразования [Markdown][cmark]-разметки в [LORCODE][].
 
+## Установка
+
+_Требуется наличие расширения для управления пользовательскими скриптами
+(Greasemonkey, Violent monkey, Tampermonkey)._
+
+Добавьте файл [lordown.user.js](https://gitlab.com/smaximov/lordown/raw/master/dist/lordown.user.js)
+к пользовательским скриптам браузера.
+
 ## Разметка
 
 Для справки см. [Commonmark][cmark] и [LORCODE][].
