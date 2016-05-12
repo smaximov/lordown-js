@@ -140,5 +140,17 @@ describe('Lordown', () => {
       expect(converter.convert('[list][*]first[/list]'))
         .to.be.equal('[list][*]first[/list]\n\n')
     })
+
+    it('should parse LORCODE text style tags', () => {
+      const tags = [
+        's', 'u', 'b', 'i',
+        'em', 'strong',
+      ]
+
+      for (let tag of tags) {
+        expect(converter.convert(`pre [${tag}]text[/${tag}] post`))
+          .to.be.equal(`pre [${tag}]text[/${tag}] post\n\n`)
+      }
+    })
   })
 })
