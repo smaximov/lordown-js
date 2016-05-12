@@ -1,18 +1,21 @@
 rules:
   linebreak-style:
-    - 2
+    - error
     - unix
   no-undef:
-    - 2
+    - error
     - typeof: true
   no-mixed-spaces-and-tabs:
-    - 0
+    - error
   no-console:
-    - 1
+    - error
   no-unused-vars:
-    - 2
+    - error
     - varsIgnorePattern: "^_"
       argsIgnorePattern: "^_"
+  comma-dangle:
+    - error
+    - only-multiline
 env:
   node: true
   es6: true
