@@ -8093,7 +8093,7 @@ function debug(what) {
       args[_key - 1] = arguments[_key];
     }
 
-    (_console = console).debug.apply(_console, ['lordown :: ' + what + ' ' + (args.length === 0 ? '' : '::')].concat(args)); // eslint-disable-line no-console
+    (_console = console).debug.apply(_console, ['lordown :: ' + what + (args.length === 0 ? '' : ' ::')].concat(args)); // eslint-disable-line no-console
   }
 }
 

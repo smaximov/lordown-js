@@ -24,7 +24,7 @@ function debugEnabled() {
 
 function debug(what, ...args) {
   if (debugEnabled()) {
-    console.debug(`lordown :: ${what} ${args.length === 0 ? '' : '::'}`, ...args) // eslint-disable-line no-console
+    console.debug(`lordown :: ${what}${args.length === 0 ? '' : ' ::'}`, ...args) // eslint-disable-line no-console
   }
 }
 
