@@ -132,8 +132,10 @@ function init(form) {
 
   const convert = () => {
     if (lordownButton.enabled) {
-      debug('convert', 'markdown -> lorcode')
+      const start = Date.now()
       msg.value = lordown.convert(markdownMsg.value)
+      const end = Date.now()
+      debug('convert',`${end - start} ms`)
     }
   }
 

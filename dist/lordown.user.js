@@ -8243,8 +8243,10 @@ function init(form) {
 
   var convert = function convert() {
     if (lordownButton.enabled) {
-      debug('convert', 'markdown -> lorcode');
+      var start = Date.now();
       msg.value = lordown.convert(markdownMsg.value);
+      var end = Date.now();
+      debug('convert', end - start + ' ms');
     }
   };
 
