@@ -1,4 +1,4 @@
-# Lordown [![build status](https://gitlab.com/smaximov/lordown/badges/master/build.svg)](https://gitlab.com/smaximov/lordown/commits/master)
+# Lordown [![build status](https://gitlab.com/smaximov/lordown/badges/master/build.svg)](https://gitlab.com/smaximov/lordown/commits/master) [![license](https://img.shields.io/badge/license-UNLICENSE-blue.svg)](https://unlicense.org/)
 
 Lordown &mdash; пользовательский скрипт для преобразования [Markdown][cmark]-разметки в [LORCODE][].
 
