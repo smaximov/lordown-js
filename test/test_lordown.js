@@ -131,4 +131,14 @@ describe('Lordown', () => {
     expect(converter.convert('::: cut summary\ncut contents\n:::'))
       .to.be.equal('[cut=cut summary]cut contents\n\n[/cut]')
   })
+
+  context('Ignored LORCODE tags', () => {
+    it('should parse LORCODE list bullets', () => {
+      expect(converter.convert('[list][*]first[*]second[/list]'))
+        .to.be.equal('[list][*]first[*]second[/list]\n\n')
+
+      expect(converter.convert('[list][*]first[/list]'))
+        .to.be.equal('[list][*]first[/list]\n\n')
+    })
+  })
 })
