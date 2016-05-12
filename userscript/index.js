@@ -107,6 +107,11 @@ function init(form) {
     return
   }
 
+  if (choice('edit') !== null) {
+    debug('init', 'editing comments not implemented, disable Lordown')
+    return
+  }
+
   const msg = choice('msg', 'form_msg')
   if (msg === null) {
     debug('init', 'comment textarea not found')
