@@ -133,6 +133,9 @@ describe('Lordown', () => {
   })
 
   context('Ignored LORCODE tags', () => {
+    const converter = new Lordown
+    converter.md.use(require('../lib/lorcode'))
+
     it('parse LORCODE list bullets', () => {
       expect(converter.convert('[list][*]first[*]second[/list]'))
         .to.be.equal('[list][*]first[*]second[/list]\n\n')
