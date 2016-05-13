@@ -133,7 +133,7 @@ function init(form) {
     setVisible(msg, !enabled)
     setVisible(markdownMsg, enabled)
   })
-  lordownButton.appendTo(form.querySelector(`label[for=${msg.name}]`))
+  lordownButton.appendTo(form.querySelector(`label[for=${msg.id}]`))
 
   const convert = () => {
     if (lordownButton.enabled) {
