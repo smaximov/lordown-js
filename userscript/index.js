@@ -1,5 +1,6 @@
-const Lordown = require('../lib')
-const lordown = new Lordown
+const lordown = require('../lib')
+const MarkdownIt = require('markdown-it')
+const ld = new MarkdownIt(lordown.OPTIONS).use(lordown.plugin)
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Testing_for_support_vs_availability
 function storageAvailable(type) {
@@ -146,7 +147,7 @@ function init(form) {
   const convert = () => {
     if (lordownButton.enabled) {
       const start = Date.now()
-      msg.value = lordown.convert(markdownMsg.value)
+      msg.value = ld.render(markdownMsg.value)
       const end = Date.now()
       debug('convert',`${end - start} ms`)
     }

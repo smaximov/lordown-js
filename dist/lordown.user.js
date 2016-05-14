@@ -38,64 +38,28 @@ module.exports = cut;
 },{"markdown-it-container":9}],2:[function(require,module,exports){
 'use strict';
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-var MarkdownIt = require('markdown-it');
-
 /**
  * Markdown to LORCODE converter.
  */
 
-var Lordown = function () {
-  /**
-   * Create a new instance of {@link Lordown}.
-   */
+function lordown(md) {
+  md.use(require('./renderer')).use(require('./cut')).use(require('./mention'));
+}
 
-  function Lordown() {
-    _classCallCheck(this, Lordown);
+/**
+ * Preferred MarkdownIt options to use
+ */
+var options = {
+  html: true,
+  typographer: true,
+  linkify: true
+};
 
-    this.md = new MarkdownIt({
-      html: true,
-      typographer: true,
-      linkify: true
-    });
+exports.OPTIONS = options;
 
-    this.md.use(require('./renderer')).use(require('./cut')).use(require('./mention'));
-  }
+exports.plugin = lordown;
 
-  /**
-   * Convert Markdown to LORCODE.
-   *
-   * @param {string} input
-   * @return {string}
-   */
-
-
-  _createClass(Lordown, [{
-    key: 'convert',
-    value: function convert(input) {
-      return this.md.render(input);
-    }
-
-    /**
-     * Parse Markdown into a token stream (for debugging only).
-     */
-
-  }, {
-    key: 'parse',
-    value: function parse(input) {
-      return this.md.parse(input);
-    }
-  }]);
-
-  return Lordown;
-}();
-
-module.exports = Lordown;
-
-},{"./cut":1,"./mention":3,"./renderer":4,"markdown-it":10}],3:[function(require,module,exports){
+},{"./cut":1,"./mention":3,"./renderer":4}],3:[function(require,module,exports){
 'use strict';
 
 var splitter = require('./splitter');
@@ -267,7 +231,7 @@ function isRegExp(obj) { return _class(obj) === '[object RegExp]'; }
 function isFunction(obj) { return _class(obj) === '[object Function]'; }
 
 
-function escapeRE (str) { return str.replace(/[.?*+^$[\]\\(){}|-]/g, '\\$&'); }
+function escapeRE(str) { return str.replace(/[.?*+^$[\]\\(){}|-]/g, '\\$&'); }
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -475,7 +439,7 @@ function compile(self) {
   // Build schema condition
   //
   var slist = Object.keys(self.__compiled__)
-                      .filter(function(name) {
+                      .filter(function (name) {
                         // Filter disabled & fake schemas
                         return name.length > 0 && self.__compiled__[name];
                       })
@@ -759,7 +723,7 @@ LinkifyIt.prototype.testSchemaAt = function testSchemaAt(text, schema, pos) {
  * LinkifyIt#match(text) -> Array|null
  *
  * Returns array of found link descriptions or `null` on fail. We strongly
- * to use [[LinkifyIt#test]] first, for best speed.
+ * recommend to use [[LinkifyIt#test]] first, for best speed.
  *
  * ##### Result match description
  *
@@ -826,7 +790,7 @@ LinkifyIt.prototype.tlds = function tlds(list, keepOld) {
 
   this.__tlds__ = this.__tlds__.concat(list)
                                   .sort()
-                                  .filter(function(el, idx, arr) {
+                                  .filter(function (el, idx, arr) {
                                     return el !== arr[idx - 1];
                                   })
                                   .reverse();
@@ -1003,7 +967,7 @@ exports.tpl_host_fuzzy_test =
 
 exports.tpl_email_fuzzy =
 
-    '(^|>|' + src_ZCc + ')(' + src_email_name + '@' + tpl_host_fuzzy_strict + ')';
+    '(^|>|\\(|' + src_ZCc + ')(' + src_email_name + '@' + tpl_host_fuzzy_strict + ')';
 
 exports.tpl_link_fuzzy =
     // Fuzzy link can't be prepended with .:/\- and non punctuation.
@@ -8024,8 +7988,9 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var Lordown = require('../lib');
-var lordown = new Lordown();
+var lordown = require('../lib');
+var MarkdownIt = require('markdown-it');
+var ld = new MarkdownIt(lordown.OPTIONS).use(lordown.plugin);
 
 // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Testing_for_support_vs_availability
 function storageAvailable(type) {
@@ -8218,7 +8183,7 @@ function init(form) {
   var convert = function convert() {
     if (lordownButton.enabled) {
       var start = Date.now();
-      msg.value = lordown.convert(markdownMsg.value);
+      msg.value = ld.render(markdownMsg.value);
       var end = Date.now();
       debug('convert', end - start + ' ms');
     }
@@ -8262,4 +8227,4 @@ handle(window, 'load', function () {
   log: false
 });
 
-},{"../lib":2}]},{},[74]);
+},{"../lib":2,"markdown-it":10}]},{},[74]);

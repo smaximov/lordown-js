@@ -19,7 +19,6 @@
   },
   "homepage": "https://gitlab.com/smaximov/lordown#README",
   "dependencies": {
-    "markdown-it": "^6.0.1",
     "markdown-it-container": "^2.0.0"
   },
   "devDependencies": {
@@ -32,6 +31,7 @@
     "gulp-concat": "^2.6.0",
     "gulp-eslint": "^2.0.0",
     "gulp-mocha": "^2.2.0",
+    "markdown-it": "^6.0.1",
     "mocha": "^2.4.5",
     "vinyl-source-stream": "^1.1.0",
     "yargs": "^4.7.0"

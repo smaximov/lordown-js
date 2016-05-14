@@ -1,41 +1,43 @@
 'use strict';
 
-const Lordown = require('../lib')
+const MarkdownIt = require('markdown-it')
+const lordown = require('../lib')
 
 describe('Lordown', () => {
-  const converter = new Lordown
+  const converter = new MarkdownIt(lordown.OPTIONS)
+  converter.use(lordown.plugin)
 
   it('render a single paragraph', () => {
-    expect(converter.convert('hello world')).to.be.equal('hello world\n\n')
+    expect(converter.render('hello world')).to.be.equal('hello world\n\n')
   })
 
   it('render paragraphs separated by the empty line', () => {
-    expect(converter.convert('hello\n\nworld')).to.be.equal('hello\n\nworld\n\n')
+    expect(converter.render('hello\n\nworld')).to.be.equal('hello\n\nworld\n\n')
   })
 
   it('render consecutive lines as a single paragraph', () => {
-    expect(converter.convert('hello\nworld')).to.be.equal('hello\nworld\n\n')
+    expect(converter.render('hello\nworld')).to.be.equal('hello\nworld\n\n')
   })
 
   it('render **text** or __text__ as [strong]text[/strong]', () => {
-    expect(converter.convert('**text**')).to.be.equal('[strong]text[/strong]\n\n')
-    expect(converter.convert('__text__')).to.be.equal('[strong]text[/strong]\n\n')
+    expect(converter.render('**text**')).to.be.equal('[strong]text[/strong]\n\n')
+    expect(converter.render('__text__')).to.be.equal('[strong]text[/strong]\n\n')
   })
 
   it('render *text* or _text_ as [em]text[/em]', () => {
-    expect(converter.convert('*text*')).to.be.equal('[em]text[/em]\n\n')
-    expect(converter.convert('_text_')).to.be.equal('[em]text[/em]\n\n')
+    expect(converter.render('*text*')).to.be.equal('[em]text[/em]\n\n')
+    expect(converter.render('_text_')).to.be.equal('[em]text[/em]\n\n')
   })
 
   it('render `text` as [inline]text[/inline]', () => {
-    expect(converter.convert('`text`')).to.be.equal('[inline]text[/inline]\n\n')
+    expect(converter.render('`text`')).to.be.equal('[inline]text[/inline]\n\n')
   })
 
   it('render blockquotes', () => {
-    expect(converter.convert('> text')).to.be.equal('[quote]text\n\n[/quote]')
-    expect(converter.convert('> first line\n> consecutive line'))
+    expect(converter.render('> text')).to.be.equal('[quote]text\n\n[/quote]')
+    expect(converter.render('> first line\n> consecutive line'))
       .to.be.equal('[quote]first line\nconsecutive line\n\n[/quote]')
-    expect(converter.convert('> first line\n>\n> second line'))
+    expect(converter.render('> first line\n>\n> second line'))
       .to.be.equal('[quote]first line\n\nsecond line\n\n[/quote]')
 
     let input = `> first line
@@ -52,95 +54,97 @@ describe('Lordown', () => {
 
 [/quote]`
 
-    expect(converter.convert(input)).to.be.equal(expected)
+    expect(converter.render(input)).to.be.equal(expected)
   })
 
   it('separate blockquotes from paragraphs with the empty line', () => {
-    expect(converter.convert('> quote line\nconsecutive line'))
+    expect(converter.render('> quote line\nconsecutive line'))
       .to.be.equal('[quote]quote line\nconsecutive line\n\n[/quote]')
-    expect(converter.convert('> quote line\n\nparagraph line'))
+    expect(converter.render('> quote line\n\nparagraph line'))
       .to.be.equal('[quote]quote line\n\n[/quote]paragraph line\n\n')
   })
 
   it('render code blocks', () => {
-    expect(converter.convert('    console.log(`hello, world`)'))
+    expect(converter.render('    console.log(`hello, world`)'))
       .to.be.equal('[code]console.log(`hello, world`)[/code]\n')
   })
 
   it('render fenced code blocks', () => {
-    expect(converter.convert('```\nconsole.log(`hello, world`)\n```'))
+    expect(converter.render('```\nconsole.log(`hello, world`)\n```'))
       .to.be.equal('[code]console.log(`hello, world`)\n[/code]\n')
-    expect(converter.convert('``` js\nconsole.log(`hello, world`)\n```'))
+    expect(converter.render('``` js\nconsole.log(`hello, world`)\n```'))
       .to.be.equal('[code=js]console.log(`hello, world`)\n[/code]\n')
   })
 
   it('render lists', () => {
-    expect(converter.convert('- first item\n- second item'))
+    expect(converter.render('- first item\n- second item'))
       .to.be.equal('[list][*]first item\n\n[*]second item\n\n[/list]')
 
-    expect(converter.convert('1) first item\n2) second item'))
+    expect(converter.render('1) first item\n2) second item'))
       .to.be.equal('[list=1][*]first item\n\n[*]second item\n\n[/list]')
   })
 
   it('render inline links', () => {
-    expect(converter.convert('[foo](https://foo.bar)'))
+    expect(converter.render('[foo](https://foo.bar)'))
       .to.be.equal('[url=https://foo.bar]foo[/url]\n\n')
   })
 
   it('render reference-style links', () => {
-    expect(converter.convert('[foo][]\n\n[foo]: https://foo.bar'))
+    expect(converter.render('[foo][]\n\n[foo]: https://foo.bar'))
       .to.be.equal('[url=https://foo.bar]foo[/url]\n\n')
   })
 
   it('linkify URL-like text', () => {
-    expect(converter.convert('https://foo.bar'))
+    expect(converter.render('https://foo.bar'))
       .to.be.equal('[url=https://foo.bar]https://foo.bar[/url]\n\n')
   })
 
   it('render ~~text~~ as [s]text[/s]', () => {
-    expect(converter.convert('~~text~~')).to.be.equal('[s]text[/s]\n\n')
+    expect(converter.render('~~text~~')).to.be.equal('[s]text[/s]\n\n')
   })
 
   it('render user mentions', () => {
-    expect(converter.convert('@maxcom')).to.be.equal('[user]maxcom[/user]\n\n')
-    expect(converter.convert('preceding @user1 text @user2 trailing'))
+    expect(converter.render('@maxcom')).to.be.equal('[user]maxcom[/user]\n\n')
+    expect(converter.render('preceding @user1 text @user2 trailing'))
       .to.be.equal('preceding [user]user1[/user] text [user]user2[/user] trailing\n\n')
   })
 
   it('render mentions for usernames with underscores', () => {
-  //  expect(converter.convert('@user_with_underscores'))
-  //    .to.be.equal('[user]user_with_underscores[/user]\n\n')
-    expect(converter.convert('@_user_')).to.be.equal('[user]_user_[/user]\n\n')
+    expect(converter.render('@user_with_underscores'))
+      .to.be.equal('[user]user_with_underscores[/user]\n\n')
+    expect(converter.render('@_user_')).to.be.equal('[user]_user_[/user]\n\n')
   })
 
   it('distinguish email addresses from user mentions', () => {
-    expect(converter.convert('user@example.com'))
+    expect(converter.render('user@example.com'))
       .to.be.equal('[url=mailto:user@example.com]user@example.com[/url]\n\n')
   })
 
   it('ignore mention-like syntax inside code blocks', () => {
-    expect(converter.convert('`@foo`')).to.be.equal('[inline]@foo[/inline]\n\n')
-    expect(converter.convert('```\n@foo\n```'))
+    expect(converter.render('`@foo`')).to.be.equal('[inline]@foo[/inline]\n\n')
+    expect(converter.render('```\n@foo\n```'))
       .to.be.equal('[code]@foo\n[/code]\n')
   })
 
   it('render cuts', () => {
-    expect(converter.convert(':::\ncut contents\n:::'))
+    expect(converter.render(':::\ncut contents\n:::'))
       .to.be.equal('[cut]cut contents\n\n[/cut]')
 
-    expect(converter.convert('::: cut summary\ncut contents\n:::'))
+    expect(converter.render('::: cut summary\ncut contents\n:::'))
       .to.be.equal('[cut=cut summary]cut contents\n\n[/cut]')
   })
 
   context('Ignored LORCODE tags', () => {
-    const converter = new Lordown
-    converter.md.use(require('../lib/lorcode'))
+    const converter = new MarkdownIt(lordown.OPTIONS)
+    converter
+      .use(lordown.plugin)
+      .use(require('../lib/lorcode'))
 
     it('parse LORCODE list bullets', () => {
-      expect(converter.convert('[list][*]first[*]second[/list]'))
+      expect(converter.render('[list][*]first[*]second[/list]'))
         .to.be.equal('[list][*]first[*]second[/list]\n\n')
 
-      expect(converter.convert('[list][*]first[/list]'))
+      expect(converter.render('[list][*]first[/list]'))
         .to.be.equal('[list][*]first[/list]\n\n')
     })
 
@@ -151,7 +155,7 @@ describe('Lordown', () => {
       ]
 
       for (let tag of tags) {
-        expect(converter.convert(`pre [${tag}]text[/${tag}] post`))
+        expect(converter.render(`pre [${tag}]text[/${tag}] post`))
           .to.be.equal(`pre [${tag}]text[/${tag}] post\n\n`)
       }
     })
@@ -162,7 +166,7 @@ describe('Lordown', () => {
       ]
 
       for (let tag of tags) {
-        expect(converter.convert(`pre [${tag}=_parameter_]text[/${tag} post]`))
+        expect(converter.render(`pre [${tag}=_parameter_]text[/${tag} post]`))
           .to.be.equal(`pre [${tag}=_parameter_]text[/${tag} post]\n\n`)
       }
     })
