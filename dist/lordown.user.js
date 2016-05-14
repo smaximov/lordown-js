@@ -117,7 +117,7 @@ function lordownRenderer(md) {
   };
 
   // Add `${tag}` (or `${tag}_open`, `${tag}_close`) rules for a tag
-  var addTag = function addTag(tag, open, close) {
+  var rule = function rule(tag, open, close) {
     var openRule = typeof open === 'string' ? function () {
       return open;
     } : open;
@@ -133,13 +133,13 @@ function lordownRenderer(md) {
     }
   };
 
-  addTag('code_inline', function (tokens, idx) {
+  rule('code_inline', function (tokens, idx) {
     return '[inline]' + tokens[idx].content + '[/inline]';
   });
-  addTag('code_block', function (tokens, idx) {
+  rule('code_block', function (tokens, idx) {
     return '[code]' + tokens[idx].content + '[/code]\n';
   });
-  addTag('fence', function (tokens, idx) {
+  rule('fence', function (tokens, idx) {
     var token = tokens[idx];
     var info = token.info ? token.info.trim() : '';
     var lang = info.split(/\s+/g)[0];
@@ -148,22 +148,22 @@ function lordownRenderer(md) {
     return '' + openTag + token.content + '[/code]\n';
   });
 
-  addTag('paragraph', '', '\n\n');
-  addTag('strong', '[strong]', '[/strong]');
-  addTag('em', '[em]', '[/em]');
-  addTag('blockquote', '[quote]', '[/quote]');
-  addTag('s', '[s]', '[/s]');
-  addTag('ordered_list', '[list=1]', '[/list]');
-  addTag('bullet_list', '[list]', '[/list]');
-  addTag('list_item', '[*]', '');
-  addTag('link', function (tokens, idx) {
+  rule('paragraph', '', '\n\n');
+  rule('strong', '[strong]', '[/strong]');
+  rule('em', '[em]', '[/em]');
+  rule('blockquote', '[quote]', '[/quote]');
+  rule('s', '[s]', '[/s]');
+  rule('ordered_list', '[list=1]', '[/list]');
+  rule('bullet_list', '[list]', '[/list]');
+  rule('list_item', '[*]', '');
+  rule('link', function (tokens, idx) {
     return '[url=' + getAttr(tokens[idx], 'href') + ']';
   }, '[/url]');
-  addTag('heading', '[strong]', '[/strong]\n\n');
-  addTag('hr', function (tokens, idx) {
+  rule('heading', '[strong]', '[/strong]\n\n');
+  rule('hr', function (tokens, idx) {
     return tokens[idx].markup + '\n\n';
   });
-  addTag('image', function (tokens, idx, options, env) {
+  rule('image', function (tokens, idx, options, env) {
     var token = tokens[idx];
     var src = getAttr(token, 'src');
     var alt = token.children.length === 0 ? src : renderer.renderInlineAsText(token.children, options, env);
