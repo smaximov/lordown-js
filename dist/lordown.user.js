@@ -160,6 +160,7 @@ function lordownRenderer(md) {
   addTag('link', function (tokens, idx) {
     return '[url=' + getAttr(tokens[idx], 'href') + ']';
   }, '[/url]');
+  addTag('heading', '[strong]', '[/strong]\n\n');
 }
 
 module.exports = lordownRenderer;
