@@ -41,6 +41,7 @@ function handle(element, event, handler, options={}) {
       if (doLog) {
         debug('handle', `handle '${event}' event for`,  element)
       }
+
       return handler(e)
     }
     return undefined
@@ -64,7 +65,13 @@ function choice(...ids) {
 function clone(node, updateAttr={}) {
   const result = node.cloneNode()
   for (let attr in updateAttr) {
-    result.setAttribute(attr, updateAttr[attr])
+    const val = updateAttr[attr]
+
+    if (val === null) {
+      result.removeAttribute(attr)
+    } else {
+      result.setAttribute(attr, val)
+    }
   }
 
   return result
@@ -113,6 +120,7 @@ function init(form) {
   }
 
   const msg = choice('msg', 'form_msg')
+
   if (msg === null) {
     debug('init', 'comment textarea not found')
     return
@@ -151,13 +159,22 @@ function init(form) {
     handle(previewButton, 'mousedown', convert)
   }
 
-  handle(markdownMsg, 'keydown', convert, {
+  const submit = form.querySelector('button:not(name)')
+
+  handle(markdownMsg, 'keydown', () => {
+    // Cloning an element discards its event listeners,
+    // so we are going to trigger `submit` manually via `click`.
+    submit.click()
+  }, {
     when(event) {
+      // Ctrl + Enter
       return event.keyCode === 13 && event.ctrlKey
     }
   })
 
-  handle(form, 'submit', convert)
+  // We can't rely on the `submit` event since event listeners
+  // are fired (at best) in the order they are attached to the element.
+  handle(submit, 'click', convert)
 }
 
 const css = `

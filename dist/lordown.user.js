@@ -8114,6 +8114,7 @@ function handle(element, event, handler) {
       if (doLog) {
         debug('handle', 'handle \'' + event + '\' event for', element);
       }
+
       return handler(e);
     }
     return undefined;
@@ -8164,7 +8165,13 @@ function clone(node) {
 
   var result = node.cloneNode();
   for (var attr in updateAttr) {
-    result.setAttribute(attr, updateAttr[attr]);
+    var val = updateAttr[attr];
+
+    if (val === null) {
+      result.removeAttribute(attr);
+    } else {
+      result.setAttribute(attr, val);
+    }
   }
 
   return result;
@@ -8224,6 +8231,7 @@ function init(form) {
   }
 
   var msg = choice('msg', 'form_msg');
+
   if (msg === null) {
     debug('init', 'comment textarea not found');
     return;
@@ -8244,7 +8252,7 @@ function init(form) {
     setVisible(msg, !enabled);
     setVisible(markdownMsg, enabled);
   });
-  lordownButton.appendTo(form.querySelector('label[for=' + msg.name + ']'));
+  lordownButton.appendTo(form.querySelector('label[for=' + msg.id + ']'));
 
   var convert = function convert() {
     if (lordownButton.enabled) {
@@ -8262,13 +8270,22 @@ function init(form) {
     handle(previewButton, 'mousedown', convert);
   }
 
-  handle(markdownMsg, 'keydown', convert, {
+  var submit = form.querySelector('button:not(name)');
+
+  handle(markdownMsg, 'keydown', function () {
+    // Cloning an element discards its event listeners,
+    // so we are going to trigger `submit` manually via `click`.
+    submit.click();
+  }, {
     when: function when(event) {
+      // Ctrl + Enter
       return event.keyCode === 13 && event.ctrlKey;
     }
   });
 
-  handle(form, 'submit', convert);
+  // We can't rely on the `submit` event since event listeners
+  // are fired (at best) in the order they are attached to the element.
+  handle(submit, 'click', convert);
 }
 
 var css = '\n.lordown-button {\n  cursor: pointer;\n  margin-left: .5em;\n  text-decoration: underline;\n}\n\n.lordown-button-disabled {\n  text-decoration: line-through;\n}\n';
