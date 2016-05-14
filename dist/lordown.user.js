@@ -8633,7 +8633,7 @@ function init(form) {
   };
 
   // Async previews use XHR instead of submit
-  var previewButton = form.querySelector('button[type=button][name=preview]');
+  var previewButton = form.querySelector('button[name=preview]');
   if (previewButton !== null) {
     // Use `mousedown` instead of `click` since it's fired first
     handle(previewButton, 'mousedown', convert);
