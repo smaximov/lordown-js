@@ -43,7 +43,7 @@ module.exports = cut;
  */
 
 function lordown(md) {
-  md.use(require('./renderer')).use(require('./cut')).use(require('./mention'));
+  md.use(require('./renderer')).use(require('./cut')).use(require('./mention')).disable(['table']);
 }
 
 /**
