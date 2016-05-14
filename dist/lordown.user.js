@@ -124,7 +124,6 @@ function lordownRenderer(md) {
     var closeRule = typeof close === 'string' ? function () {
       return close;
     } : close;
-
     var single = close === undefined || close === null;
 
     renderer.rules['' + tag + (single ? '' : '_open')] = openRule;
@@ -163,6 +162,12 @@ function lordownRenderer(md) {
   addTag('heading', '[strong]', '[/strong]\n\n');
   addTag('hr', function (tokens, idx) {
     return tokens[idx].markup + '\n\n';
+  });
+  addTag('image', function (tokens, idx, options, env) {
+    var token = tokens[idx];
+    var src = getAttr(token, 'src');
+    var alt = token.children.length === 0 ? src : renderer.renderInlineAsText(token.children, options, env);
+    return '[url=' + src + ']' + alt + '[/url]';
   });
 }
 

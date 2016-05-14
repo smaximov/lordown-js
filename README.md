@@ -108,6 +108,10 @@ Some text
 | `https://youtu.be/dQw4w9WgXcQ` или `<https://youtu.be/dQw4w9WgXcQ>` | `[url=https://youtu.be/dQw4w9WgXcQ]https://youtu.be/dQw4w9WgXcQ[/url]` | URL |
 | `user@example.com` или `<user@example.com>` | `[url=mailto:user@example.com]user@example.com[/url]` | email |
 
+### Изображения
+
+Изображения выводятся как ссылки (`![foo](bar.png)` превращается в `[url=bar.png]foo[/url]`).
+
 ### Ссылка на профиль пользователя (каст)
 
 `@maxcom` превращается в `[user]maxcom[/user]`.

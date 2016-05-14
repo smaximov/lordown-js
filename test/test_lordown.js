@@ -192,5 +192,17 @@ describe('Lordown', () => {
           .to.be.equal(`Some text\n\n${c.repeat(10)}\n\nSome text\n\n`)
       }
     })
+
+    it('render images as URLs', () => {
+      const expected = '[url=bar.png]foo[/url]\n\n'
+      expect(converter.render('![foo](bar.png)'))
+        .to.be.equal(expected)
+
+      expect(converter.render('![foo][1]\n\n[1]: bar.png'))
+        .to.be.equal(expected)
+
+      expect(converter.render('![foo][1]\n\n[1]: bar.png "title"'))
+        .to.be.equal(expected)
+    })
   })
 })
