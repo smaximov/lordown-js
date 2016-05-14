@@ -205,4 +205,55 @@ describe('Lordown', () => {
         .to.be.equal(expected)
     })
   })
+
+  context('Footnotes', () => {
+    it('render footnotes', () => {
+      const converter = new MarkdownIt(lordown.OPTIONS)
+      converter.use(lordown.plugin, {
+        footnote: true,
+        footnoteCaption: 'Footnotes',
+      })
+
+      const original = `\
+Here is a footnote reference,[^1] and another.[^longnote]
+
+[^1]: Here is the footnote.
+
+[^longnote]: Here is one with multiple blocks.
+
+    Subsequent paragraphs are indented to show that they
+belong to the previous footnote.
+
+Here is an inline note.^[Inlines notes are easier to write, since
+you do not have to pick an identifier and move down to type the
+note.]
+`
+      const expected = `\
+Here is a footnote reference,[1] and another.[2]
+
+Here is an inline note.[3]
+
+[strong]Footnotes[/strong]:
+
+[list=1][*]Here is the footnote.
+
+[*]Here is one with multiple blocks.
+
+Subsequent paragraphs are indented to show that they
+belong to the previous footnote.
+
+[*]Inlines notes are easier to write, since
+you do not have to pick an identifier and move down to type the
+note.
+
+[/list]\n
+`
+      expect(converter.render(original)).to.be.equal(expected)
+    })
+
+    it('disabled footnotes', () => {
+      expect(converter.render('Text with ^[Inline footnote]'))
+        .to.be.equal('Text with ^[Inline footnote]\n\n')
+    })
+  })
 })

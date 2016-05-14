@@ -15,6 +15,14 @@ class Config {
     return Config.bool('lordown.debug', false)
   }
 
+  get footnote() {
+    return Config.bool('lordown.footnote', true)
+  }
+
+  get footnoteCaption() {
+    return Config.get('lordown.footnote.caption', 'Сноски')
+  }
+
   // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Testing_for_support_vs_availability
   static get available() {
     try {

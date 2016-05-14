@@ -3,7 +3,12 @@ const lordown = require('../lib')
 const MarkdownIt = require('markdown-it')
 
 const config = new Config
-const ld = new MarkdownIt(lordown.OPTIONS).use(lordown.plugin)
+const ld = new MarkdownIt(lordown.OPTIONS)
+
+ld.use(lordown.plugin, {
+  footnote: config.footnote,
+  footnoteCaption: config.footnoteCaption
+})
 
 function debug(what, ...args) {
   if (config.debug) {
