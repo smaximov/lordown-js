@@ -161,6 +161,9 @@ function lordownRenderer(md) {
     return '[url=' + getAttr(tokens[idx], 'href') + ']';
   }, '[/url]');
   addTag('heading', '[strong]', '[/strong]\n\n');
+  addTag('hr', function (tokens, idx) {
+    return tokens[idx].markup + '\n\n';
+  });
 }
 
 module.exports = lordownRenderer;

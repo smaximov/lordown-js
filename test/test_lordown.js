@@ -173,8 +173,9 @@ describe('Lordown', () => {
   })
 
   context('Unsupported features', () => {
-    const expected = 'Some text\n\n[strong]heading[/strong]\n\nSome text\n\n'
     it('render headings as bold text', () => {
+      const expected = 'Some text\n\n[strong]heading[/strong]\n\nSome text\n\n'
+
       for (let i = 1; i <= 6; i++) {
         expect(converter.render(`Some text\n${'#'.repeat(i)} heading\nSome text`))
           .to.be.equal(expected)
@@ -182,6 +183,13 @@ describe('Lordown', () => {
       for (let c of "-=") {
         expect(converter.render(`Some text\n\nheading\n${c.repeat(10)}\nSome text`))
           .to.be.equal(expected)
+      }
+    })
+
+    it('render hrule as is', () => {
+      for (let c of '-*') {
+        expect(converter.render(`Some text\n\n${c.repeat(10)}\n\nSome text`))
+          .to.be.equal(`Some text\n\n${c.repeat(10)}\n\nSome text\n\n`)
       }
     })
   })

@@ -48,6 +48,28 @@ Some text
 Some text
 ```
 
+### Horizontal rule
+
+Линии (*hrule*, *horizontal rule*) отображаются без изменений отдельным параграформ:
+
+```
+Some text
+
+****
+
+Some text
+```
+
+превращается в
+
+```
+Some text
+
+****
+
+Some text
+```
+
 ### Стили текста
 
 | Markdown | Lorcode | Примечание |
