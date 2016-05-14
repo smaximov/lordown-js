@@ -44,8 +44,6 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var MarkdownIt = require('markdown-it');
 
-var LordownRenderer = require('./renderer');
-
 /**
  * Markdown to LORCODE converter.
  */
@@ -64,9 +62,7 @@ var Lordown = function () {
       linkify: true
     });
 
-    this.md.renderer = new LordownRenderer();
-
-    this.md.use(require('./cut')).use(require('./mention'));
+    this.md.use(require('./renderer')).use(require('./cut')).use(require('./mention'));
   }
 
   /**
@@ -143,103 +139,68 @@ module.exports = mention;
 },{"./splitter":5}],4:[function(require,module,exports){
 'use strict';
 
-var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
-
-function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
-
-function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
-
-function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
-
-var Renderer = require('markdown-it/lib/renderer');
-var Token = require('markdown-it/lib/token');
-
 /**
- * Get token attribute by name.
- *
- * @param {string} name - attribute name.
- * @return {?string}
- */
-Token.prototype.getAttr = function (name) {
-  var idx = this.attrIndex(name);
-  return idx !== -1 ? this.attrs[idx][1] : null;
-};
-
-/**
- * LORCODE renderer.
+ * LORCODE renderer plugin.
  */
 
-var LordownRenderer = function (_Renderer) {
-  _inherits(LordownRenderer, _Renderer);
+function lordownRenderer(md) {
+  var renderer = md.renderer;
 
-  /**
-   * Create a new {@link LordownRenderer} with custom rules.
-   */
+  // Get token attribute by name
+  var getAttr = function getAttr(token, name) {
+    var idx = token.attrIndex(name);
+    return idx !== -1 ? token.attrs[idx][1] : null;
+  };
 
-  function LordownRenderer() {
-    _classCallCheck(this, LordownRenderer);
+  // Add `${tag}` (or `${tag}_open`, `${tag}_close`) rules for a tag
+  var addTag = function addTag(tag, open, close) {
+    var openRule = typeof open === 'string' ? function () {
+      return open;
+    } : open;
+    var closeRule = typeof close === 'string' ? function () {
+      return close;
+    } : close;
 
-    var _this = _possibleConstructorReturn(this, Object.getPrototypeOf(LordownRenderer).call(this));
+    var single = close === undefined || close === null;
 
-    _this.rules['code_inline'] = function (tokens, idx) {
-      return '[inline]' + tokens[idx].content + '[/inline]';
-    };
-    _this.rules['code_block'] = function (tokens, idx) {
-      return '[code]' + tokens[idx].content + '[/code]\n';
-    };
-    _this.rules['fence'] = function (tokens, idx) {
-      var token = tokens[idx];
-      var info = token.info ? token.info.trim() : '';
-      var lang = info.split(/\s+/g)[0];
-      var openTag = lang ? '[code=' + lang + ']' : '[code]';
+    renderer.rules['' + tag + (single ? '' : '_open')] = openRule;
 
-      return '' + openTag + token.content + '[/code]\n';
-    };
-
-    _this.addTag('paragraph', '', '\n\n');
-    _this.addTag('strong', '[strong]', '[/strong]');
-    _this.addTag('em', '[em]', '[/em]');
-    _this.addTag('blockquote', '[quote]', '[/quote]');
-    _this.addTag('s', '[s]', '[/s]');
-    _this.addTag('ordered_list', '[list=1]', '[/list]');
-    _this.addTag('bullet_list', '[list]', '[/list]');
-    _this.addTag('list_item', '[*]', '');
-    _this.addTag('link', function (tokens, idx) {
-      return '[url=' + tokens[idx].getAttr('href') + ']';
-    }, '[/url]');
-    return _this;
-  }
-
-  /**
-   * Add matching open-close rules for a  tag.
-   *
-   * @param {string} tag - tag name.
-   * @param {string|function} open - tag open rule.
-   * @param {string|function} close - tag close rule.
-   */
-
-
-  _createClass(LordownRenderer, [{
-    key: 'addTag',
-    value: function addTag(tag, open, close) {
-      var openRule = typeof open === 'string' ? function () {
-        return open;
-      } : open;
-      var closeRule = typeof close === 'string' ? function () {
-        return close;
-      } : close;
-
-      this.rules[tag + '_open'] = openRule;
-      this.rules[tag + '_close'] = closeRule;
+    if (!single) {
+      renderer.rules[tag + '_close'] = closeRule;
     }
-  }]);
+  };
 
-  return LordownRenderer;
-}(Renderer);
+  addTag('code_inline', function (tokens, idx) {
+    return '[inline]' + tokens[idx].content + '[/inline]';
+  });
+  addTag('code_block', function (tokens, idx) {
+    return '[code]' + tokens[idx].content + '[/code]\n';
+  });
+  addTag('fence', function (tokens, idx) {
+    var token = tokens[idx];
+    var info = token.info ? token.info.trim() : '';
+    var lang = info.split(/\s+/g)[0];
+    var openTag = lang ? '[code=' + lang + ']' : '[code]';
 
-module.exports = LordownRenderer;
+    return '' + openTag + token.content + '[/code]\n';
+  });
 
-},{"markdown-it/lib/renderer":26,"markdown-it/lib/token":61}],5:[function(require,module,exports){
+  addTag('paragraph', '', '\n\n');
+  addTag('strong', '[strong]', '[/strong]');
+  addTag('em', '[em]', '[/em]');
+  addTag('blockquote', '[quote]', '[/quote]');
+  addTag('s', '[s]', '[/s]');
+  addTag('ordered_list', '[list=1]', '[/list]');
+  addTag('bullet_list', '[list]', '[/list]');
+  addTag('list_item', '[*]', '');
+  addTag('link', function (tokens, idx) {
+    return '[url=' + getAttr(tokens[idx], 'href') + ']';
+  }, '[/url]');
+}
+
+module.exports = lordownRenderer;
+
+},{}],5:[function(require,module,exports){
 'use strict';
 
 /**
