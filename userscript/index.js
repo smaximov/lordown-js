@@ -1,30 +1,12 @@
+const Config = require('./config')
 const lordown = require('../lib')
 const MarkdownIt = require('markdown-it')
+
+const config = new Config
 const ld = new MarkdownIt(lordown.OPTIONS).use(lordown.plugin)
 
-// https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Testing_for_support_vs_availability
-function storageAvailable(type) {
-  try {
-    const storage = window[type]
-    const x = '__storage_test__'
-    storage.setItem(x, x)
-    storage.removeItem(x)
-    return true
-  }
-  catch(e) {
-    return false
-  }
-}
-
-// Execute `localStorage.setItem('lordown.debug', 'true')` in the browser console
-// to enable debug logging.
-function debugEnabled() {
-  return storageAvailable('localStorage') &&
-    localStorage.getItem('lordown.debug') === 'true'
-}
-
 function debug(what, ...args) {
-  if (debugEnabled()) {
+  if (config.debug) {
     console.debug(`lordown :: ${what}${args.length === 0 ? '' : ' ::'}`, ...args) // eslint-disable-line no-console
   }
 }

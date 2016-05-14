@@ -7997,31 +7997,83 @@ var _createClass = function () { function defineProperties(target, props) { for 
 
 function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
 
-var lordown = require('../lib');
-var MarkdownIt = require('markdown-it');
-var ld = new MarkdownIt(lordown.OPTIONS).use(lordown.plugin);
-
-// https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Testing_for_support_vs_availability
-function storageAvailable(type) {
-  try {
-    var storage = window[type];
-    var x = '__storage_test__';
-    storage.setItem(x, x);
-    storage.removeItem(x);
+function parseBool(input) {
+  if (/^\s*(?:true|yes|on)\s*$/i.test(input)) {
     return true;
-  } catch (e) {
+  } else if (/^\s*(?:false|no|off)\s*$/i.test(input)) {
     return false;
   }
+
+  return undefined;
 }
 
-// Execute `localStorage.setItem('lordown.debug', 'true')` in the browser console
-// to enable debug logging.
-function debugEnabled() {
-  return storageAvailable('localStorage') && localStorage.getItem('lordown.debug') === 'true';
-}
+var Config = function () {
+  function Config() {
+    _classCallCheck(this, Config);
+  }
+
+  _createClass(Config, [{
+    key: 'debug',
+    get: function get() {
+      return Config.bool('lordown.debug', false);
+    }
+
+    // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Testing_for_support_vs_availability
+
+  }], [{
+    key: 'get',
+    value: function get(key) {
+      var def = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
+
+      if (!Config.available) return def;
+
+      var value = localStorage.getItem(key);
+      return value === null ? def : value;
+    }
+  }, {
+    key: 'bool',
+    value: function bool(key) {
+      var def = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
+
+      var value = parseBool(Config.get(key));
+      return value === undefined ? def : value;
+    }
+  }, {
+    key: 'available',
+    get: function get() {
+      try {
+        var storage = window.localStorage;
+        var x = '__storage_test__';
+        storage.setItem(x, x);
+        storage.removeItem(x);
+        return true;
+      } catch (e) {
+        return false;
+      }
+    }
+  }]);
+
+  return Config;
+}();
+
+module.exports = Config;
+
+},{}],75:[function(require,module,exports){
+'use strict';
+
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+var Config = require('./config');
+var lordown = require('../lib');
+var MarkdownIt = require('markdown-it');
+
+var config = new Config();
+var ld = new MarkdownIt(lordown.OPTIONS).use(lordown.plugin);
 
 function debug(what) {
-  if (debugEnabled()) {
+  if (config.debug) {
     var _console;
 
     for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
@@ -8236,4 +8288,4 @@ handle(window, 'load', function () {
   log: false
 });
 
-},{"../lib":2,"markdown-it":10}]},{},[74]);
+},{"../lib":2,"./config":74,"markdown-it":10}]},{},[75]);
