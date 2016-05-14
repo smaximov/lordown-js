@@ -2,7 +2,7 @@
 
 Lordown &mdash; пользовательский скрипт для преобразования [Markdown][cmark]-разметки в [LORCODE][].
 
-![Lordown](lordown.png)
+![Lordown](https://gitlab.com/smaximov/lordown/raw/master/lordown.png)
 
 ## Установка
 
