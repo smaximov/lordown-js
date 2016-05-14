@@ -14,7 +14,10 @@ const pkg = require('./package.json')
 function metadata(pairs) {
   let meta = '// ==UserScript==\n'
   for (let key in pairs) {
-    meta += `// @${key} ${pairs[key]}\n`
+    const values = [].concat(pairs[key])
+    for (let value of values) {
+      meta += `// @${key} ${value}\n`
+    }
   }
   meta += '// ==/UserScript==\n'
 
@@ -28,7 +31,7 @@ gulp.task('meta', () => {
     version: pkg.version,
     grant: 'none',
     namespace: 'https://www.linux.org.ru',
-    include: 'https://www.linux.org.ru/*',
+    include: ['https://www.linux.org.ru/*', 'http://www.linux.org.ru/*'],
     downloadURL: 'https://gitlab.com/smaximov/lordown/raw/master/dist/lordown.user.js',
     updateURL: 'https://gitlab.com/smaximov/lordown/raw/master/dist/lordown.meta.js'
   }
