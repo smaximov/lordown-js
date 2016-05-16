@@ -7,7 +7,6 @@ const concat = require('gulp-concat')
 const gulp = require('gulp')
 const mocha = require('gulp-mocha')
 const source = require('vinyl-source-stream')
-const toc = require('gulp-doctoc')
 const yargs = require('yargs')
 
 const pkg = require('./package.json')
@@ -74,17 +73,6 @@ gulp.task('lint', () => {
 
 gulp.task('watch', () => {
   return gulp.watch(['lib/**/*.js', 'test/**/*.js'], ['test', 'lint'])
-})
-
-gulp.task('toc', () => {
-  const tocOptions = {
-    mode: 'github.com',
-    notitle: true,
-  }
-
-  gulp.src('./README.md')
-    .pipe(toc(tocOptions))
-    .pipe(gulp.dest('./'))
 })
 
 gulp.task('default', ['watch', 'test', 'lint'])

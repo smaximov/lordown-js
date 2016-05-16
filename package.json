@@ -30,7 +30,6 @@
     "eslint": "^2.8.0",
     "gulp": "^3.9.1",
     "gulp-concat": "^2.6.0",
-    "gulp-doctoc": "^0.1.4",
     "gulp-eslint": "^2.0.0",
     "gulp-mocha": "^2.2.0",
     "markdown-it": "^6.0.1",
