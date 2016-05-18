@@ -8374,6 +8374,54 @@ function parseBool(input) {
   return undefined;
 }
 
+function _set(key, val, validateTransform) {
+  if (!Config.available) return;
+
+  var k = 'lordown.' + key;
+
+  if (val === null) {
+    localStorage.removeItem(k);
+    return;
+  }
+
+  var v = validateTransform(val);
+
+  if (v === undefined || v === null) return;
+
+  localStorage.setItem(k, v);
+}
+
+function setBool(key, val) {
+  _set(key, val, function (val) {
+    return typeof val === 'boolean' ? val.toString() : undefined;
+  });
+}
+
+function _get(key) {
+  var def = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
+
+  if (!Config.available) return def;
+
+  var value = localStorage.getItem('lordown.' + key);
+  return value === null ? def : value;
+}
+
+function bool(key) {
+  var def = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
+
+  var value = parseBool(_get(key));
+  return value === undefined ? def : value;
+}
+
+var modifiersMap = {
+  ctrl: 'ctrlKey',
+  meta: 'altKey',
+  shift: 'shiftKey',
+  alt: 'altKey'
+};
+
+var validModifiers = Object.keys(modifiersMap);
+
 var Config = function () {
   function Config() {
     _classCallCheck(this, Config);
@@ -8382,57 +8430,51 @@ var Config = function () {
   _createClass(Config, [{
     key: 'debug',
     get: function get() {
-      return Config.bool('debug', false);
+      return bool('debug', false);
+    },
+    set: function set(value) {
+      setBool('debug', value);
     }
   }, {
     key: 'footnote',
     get: function get() {
-      return Config.bool('footnote', true);
+      return bool('footnote', true);
+    },
+    set: function set(value) {
+      setBool('footnote', value);
     }
   }, {
     key: 'footnoteCaption',
     get: function get() {
-      return Config.get('footnote.caption', 'Сноски');
+      return _get('footnote.caption', 'Сноски');
+    },
+    set: function set(value) {
+      _set('footnote.caption', value, function (value) {
+        return typeof value === 'string' ? value : undefined;
+      });
     }
   }, {
     key: 'indent',
     get: function get() {
-      return Config.bool('indent', true);
+      return bool('indent', true);
+    },
+    set: function set(value) {
+      setBool('indent', value);
     }
   }, {
     key: 'indentModifier',
     get: function get() {
-      var modMap = {
-        ctrl: 'ctrlKey',
-        meta: 'altKey',
-        shift: 'shiftKey',
-        alt: 'altKey'
-      };
-
-      return modMap[Config.get('indent.modifier', 'ctrl')] || 'ctrlKey';
+      return modifiersMap[_get('indent.modifier', 'ctrl')] || 'ctrlKey';
+    },
+    set: function set(value) {
+      _set('indent.modifier', value, function (value) {
+        return validModifiers.indexOf(value) < 0 ? undefined : value;
+      });
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Testing_for_support_vs_availability
 
   }], [{
-    key: 'get',
-    value: function get(key) {
-      var def = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
-
-      if (!Config.available) return def;
-
-      var value = localStorage.getItem('lordown.' + key);
-      return value === null ? def : value;
-    }
-  }, {
-    key: 'bool',
-    value: function bool(key) {
-      var def = arguments.length <= 1 || arguments[1] === undefined ? undefined : arguments[1];
-
-      var value = parseBool(Config.get(key));
-      return value === undefined ? def : value;
-    }
-  }, {
     key: 'available',
     get: function get() {
       try {
