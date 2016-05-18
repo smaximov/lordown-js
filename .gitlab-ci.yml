@@ -25,7 +25,7 @@ build:
   artifacts:
     name: "lordown-$CI_BUILD_ID"
     paths:
-      - dist/
+      - dist/lordown.user.js
   except:
     - tags
   tags:
@@ -38,7 +38,7 @@ build-tags:
   artifacts:
     name: "lordown-$CI_BUILD_TAG"
     paths:
-      - dist/
+      - dist/lordown.user.js
   only:
     - tags
   tags:
