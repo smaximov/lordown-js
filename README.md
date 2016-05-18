@@ -2,7 +2,8 @@
 
 Lordown &mdash; пользовательский скрипт для преобразования [Markdown][cmark]-разметки в [LORCODE][].
 
-![Lordown](https://gitlab.com/smaximov/lordown/raw/master/lordown.png)
+[cmark]: http://commonmark.org/
+[LORCODE]: https://www.linux.org.ru/help/lorcode.md
 
 ## Установка
 
@@ -310,5 +311,6 @@ LORCODE
 }[/code]
 ```
 
-[cmark]: http://commonmark.org/
-[LORCODE]: https://www.linux.org.ru/help/lorcode.md
+## Скриншот
+
+![Lordown](https://gitlab.com/smaximov/lordown/raw/master/lordown.png)
