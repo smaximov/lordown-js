@@ -1,5 +1,10 @@
 # use implicit smaximov/nodejs image specified by the runner
 
+artifacts:
+  name: "lordown-$CI_BUILD_REF_NAME"
+  paths:
+    - dist/
+
 cache:
   key: "$CI_BUILD_REF_NAME"
   paths:
