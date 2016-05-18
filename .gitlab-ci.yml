@@ -17,16 +17,3 @@ test:
     - npm test
   tags:
     - nodejs
-
-build:
-  stage: build
-  script:
-    - npm run gulp userscript
-  artifacts:
-    name: "lordown-$CI_BUILD_ID"
-    paths:
-      - dist/lordown.user.js
-  except:
-    - tags
-  tags:
-    - nodejs
