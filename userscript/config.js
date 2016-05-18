@@ -70,7 +70,7 @@ class Config {
   }
 
   get footnoteCaption() {
-    return get('footnote.caption', 'Сноски')
+    return get('footnote.caption', '——————————')
   }
 
   set footnoteCaption(value) {

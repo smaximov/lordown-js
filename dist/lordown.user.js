@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name lordown
 // @description Markdown to LORCODE converter
-// @version 0.7.1
+// @version 0.7.2
 // @grant none
 // @namespace https://www.linux.org.ru
 // @include https://www.linux.org.ru/*
@@ -8446,7 +8446,7 @@ var Config = function () {
   }, {
     key: 'footnoteCaption',
     get: function get() {
-      return _get('footnote.caption', 'Сноски');
+      return _get('footnote.caption', '——————————');
     },
     set: function set(value) {
       _set('footnote.caption', value, function (value) {
