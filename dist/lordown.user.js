@@ -8767,28 +8767,29 @@ function init(form) {
     }
   });
 
-  // Indent keybindings enabled
-  if (config.indent) {
-    // [lordown.indent.modifier] + (← | →)
-    var indentKey = function indentKey(e) {
-      return (e.keyCode === 37 || e.keyCode === 39) && e[config.indentModifier];
-    };
+  // [lordown.indent.modifier] + (← | →)
+  var indentKey = function indentKey(e) {
+    return (e.keyCode === 37 || e.keyCode === 39) && e[config.indentModifier];
+  };
+
+  handle(markdownMsg, 'keydown', function (event) {
+    if (!config.indent) return;
 
     // Disable default action bound to [lordown.indent.modifier] + (← | →)
-    handle(markdownMsg, 'keydown', function (event) {
-      event.preventDefault();
-    }, {
-      when: indentKey
-    });
+    event.preventDefault();
+  }, {
+    when: indentKey
+  });
+
+  handle(markdownMsg, 'keyup', function (event) {
+    if (!config.indent) return;
 
     // Handle indent/unindent
-    handle(markdownMsg, 'keyup', function (event) {
-      var indent = event.keyCode === 39;
-      indentRegion(markdownMsg, indent);
-    }, {
-      when: indentKey
-    });
-  }
+    var indent = event.keyCode === 39;
+    indentRegion(markdownMsg, indent);
+  }, {
+    when: indentKey
+  });
 
   // We can't rely on the `submit` event since event listeners
   // are fired (at best) in the order they are attached to the element.
