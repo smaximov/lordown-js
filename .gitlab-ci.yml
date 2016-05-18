@@ -1,9 +1,8 @@
 # use implicit smaximov/nodejs image specified by the runner
 
-artifacts:
-  name: "lordown-$CI_BUILD_REF_NAME"
-  paths:
-    - dist/
+stages:
+  - test
+  - build
 
 cache:
   key: "$CI_BUILD_REF_NAME"
@@ -11,9 +10,36 @@ cache:
     - node_modules/
 
 test:
+  stage: test
   script:
     - npm install
     - npm run lint
     - npm test
+  tags:
+    - nodejs
+
+build:
+  stage: build
+  script:
+    - npm run userscript
+  artifacts:
+    name: "lordown-$CI_BUILD_ID"
+    paths:
+      - dist/
+  except:
+    - tags
+  tags:
+    - nodejs
+
+build-tags:
+  stage: build
+  script:
+    - npm run userscript
+  artifacts:
+    name: "lordown-$CI_BUILD_TAG"
+    paths:
+      - dist/
+  only:
+    - tags
   tags:
     - nodejs
