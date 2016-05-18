@@ -233,7 +233,7 @@ Here is a footnote reference,[1] and another.[2]
 
 Here is an inline note.[3]
 
-[strong]Footnotes[/strong]:
+[strong]Footnotes[/strong]
 
 [list=1][*]Here is the footnote.
 

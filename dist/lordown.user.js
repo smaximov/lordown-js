@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name lordown
 // @description Markdown to LORCODE converter
-// @version 0.7.0
+// @version 0.7.1
 // @grant none
 // @namespace https://www.linux.org.ru
 // @include https://www.linux.org.ru/*
@@ -48,7 +48,7 @@ function footnote(md, footnoteCaption) {
     return '[' + (tokens[idx].meta.id + 1) + ']';
   };
   rules.footnote_block_open = function () {
-    return '[strong]' + footnoteCaption + '[/strong]:\n\n[list=1]';
+    return '[strong]' + footnoteCaption + '[/strong]\n\n[list=1]';
   };
   rules.footnote_block_close = function () {
     return '[/list]\n\n';
