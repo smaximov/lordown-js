@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name lordown
 // @description Markdown to LORCODE converter
-// @version 0.6.0
+// @version 0.7.0
 // @grant none
 // @namespace https://www.linux.org.ru
 // @include https://www.linux.org.ru/*
@@ -8639,13 +8639,9 @@ function indentRegion(textarea, indent) {
   var start = textarea.selectionStart + deltaStart;
   var end = textarea.selectionEnd + deltaEnd;
 
-  debug('indent', 'delta start: ' + deltaStart + ', delta end: ' + deltaEnd);
-  debug('indent', 'start: ' + textarea.selectionStart + ' -> ' + start);
-  debug('indent', 'end: ' + textarea.selectionEnd + ' -> ' + end);
-
   textarea.value = util.splice(region.source, region.start, region.length, replacement);
-  textarea.selectionStart = start; // textarea.selectionStart + deltaStart
-  textarea.selectionEnd = end; // textarea.selectionEnd + deltaEnd
+  textarea.selectionStart = start;
+  textarea.selectionEnd = end;
 }
 
 function init(form) {
