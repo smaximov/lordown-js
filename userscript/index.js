@@ -216,25 +216,26 @@ function init(form) {
     }
   })
 
-  // Disable default action bound to Ctrl + (← | →)
-  handle(markdownMsg, 'keydown', (event) => {
-    event.preventDefault()
-  }, {
-    when(event) {
-      // Ctrl + (← | →)
-      return (event.keyCode === 37 || event.keyCode === 39) && event.ctrlKey
-    }
-  })
+  // Indent keybindings enabled
+  if (config.indent) {
+    // [lordown.indent.modifier] + (← | →)
+    const indentKey = (e) => (e.keyCode === 37 || e.keyCode === 39) && e[config.indentModifier]
 
-  handle(markdownMsg, 'keyup', (event) => {
-    const indent = event.keyCode === 39
-    indentRegion(markdownMsg, indent)
-  }, {
-    when(event) {
-      // Ctrl + (← | →)
-      return (event.keyCode === 37 || event.keyCode === 39) && event.ctrlKey
-    }
-  })
+    // Disable default action bound to [lordown.indent.modifier] + (← | →)
+    handle(markdownMsg, 'keydown', (event) => {
+      event.preventDefault()
+    }, {
+      when: indentKey,
+    })
+
+    // Handle indent/unindent
+    handle(markdownMsg, 'keyup', (event) => {
+      const indent = event.keyCode === 39
+      indentRegion(markdownMsg, indent)
+    }, {
+      when: indentKey,
+    })
+  }
 
   // We can't rely on the `submit` event since event listeners
   // are fired (at best) in the order they are attached to the element.

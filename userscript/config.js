@@ -23,6 +23,21 @@ class Config {
     return Config.get('lordown.footnote.caption', 'Сноски')
   }
 
+  get indent() {
+    return Config.bool('lordown.indent', true)
+  }
+
+  get indentModifier() {
+    const modMap = {
+      ctrl: 'ctrlKey',
+      meta: 'altKey',
+      shift: 'shiftKey',
+      alt: 'altKey',
+    }
+
+    return modMap[Config.get('lordown.indent.modifier', 'ctrl')] || 'ctrlKey'
+  }
+
   // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Testing_for_support_vs_availability
   static get available() {
     try {

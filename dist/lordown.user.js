@@ -8394,6 +8394,23 @@ var Config = function () {
     get: function get() {
       return Config.get('lordown.footnote.caption', 'Сноски');
     }
+  }, {
+    key: 'indent',
+    get: function get() {
+      return Config.bool('lordown.indent', true);
+    }
+  }, {
+    key: 'indentModifier',
+    get: function get() {
+      var modMap = {
+        ctrl: 'ctrlKey',
+        meta: 'altKey',
+        shift: 'shiftKey',
+        alt: 'altKey'
+      };
+
+      return modMap[Config.get('lordown.indent.modifier', 'ctrl')] || 'ctrlKey';
+    }
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Testing_for_support_vs_availability
 
@@ -8708,25 +8725,28 @@ function init(form) {
     }
   });
 
-  // Disable default action bound to Ctrl + (← | →)
-  handle(markdownMsg, 'keydown', function (event) {
-    event.preventDefault();
-  }, {
-    when: function when(event) {
-      // Ctrl + (← | →)
-      return (event.keyCode === 37 || event.keyCode === 39) && event.ctrlKey;
-    }
-  });
+  // Indent keybindings enabled
+  if (config.indent) {
+    // [lordown.indent.modifier] + (← | →)
+    var indentKey = function indentKey(e) {
+      return (e.keyCode === 37 || e.keyCode === 39) && e[config.indentModifier];
+    };
 
-  handle(markdownMsg, 'keyup', function (event) {
-    var indent = event.keyCode === 39;
-    indentRegion(markdownMsg, indent);
-  }, {
-    when: function when(event) {
-      // Ctrl + (← | →)
-      return (event.keyCode === 37 || event.keyCode === 39) && event.ctrlKey;
-    }
-  });
+    // Disable default action bound to [lordown.indent.modifier] + (← | →)
+    handle(markdownMsg, 'keydown', function (event) {
+      event.preventDefault();
+    }, {
+      when: indentKey
+    });
+
+    // Handle indent/unindent
+    handle(markdownMsg, 'keyup', function (event) {
+      var indent = event.keyCode === 39;
+      indentRegion(markdownMsg, indent);
+    }, {
+      when: indentKey
+    });
+  }
 
   // We can't rely on the `submit` event since event listeners
   // are fired (at best) in the order they are attached to the element.
