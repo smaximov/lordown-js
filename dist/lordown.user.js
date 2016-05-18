@@ -8444,6 +8444,8 @@ function _classCallCheck(instance, Constructor) { if (!(instance instanceof Cons
 
 var Config = require('./config');
 var lordown = require('../lib');
+var util = require('./util');
+
 var MarkdownIt = require('markdown-it');
 
 var config = new Config();
@@ -8588,6 +8590,64 @@ function setVisible(element, visible) {
   element.style.display = visible ? 'inline-block' : 'none';
 }
 
+function extendedRegion(textarea) {
+  var source = textarea.value;
+  var start = textarea.selectionStart;
+  var end = textarea.selectionEnd;
+
+  while (start > 0 && source[start - 1] !== '\n') {
+    --start;
+  }while (source.length > end && source[end] !== '\n') {
+    ++end;
+  }return {
+    start: start,
+    end: end,
+    length: end - start,
+    source: source,
+    text: source.slice(start, end)
+  };
+}
+
+function indentRegion(textarea, indent) {
+  var region = extendedRegion(textarea);
+  debug(indent ? 'indent' : 'unindent', 'region [' + region.start + ', ' + region.end + ']:\n' + util.truncate(region.text, 20));
+
+  var replacement = void 0;
+  var offset = null;
+  var delta = 0;
+
+  if (indent) {
+    replacement = region.text.replace(/^/mg, function () {
+      if (offset === null) offset = 4;
+      delta += 4;
+      return '    ';
+    });
+  } else {
+    replacement = region.text.replace(/^( {0,4})/mg, function (_match, spaces) {
+      var length = spaces.length;
+
+      if (offset === null) offset = length;
+
+      delta += length;
+      return '';
+    });
+  }
+
+  var deltaStart = (indent ? 1 : -1) * (offset || 0);
+  var deltaEnd = (indent ? 1 : -1) * delta;
+
+  var start = textarea.selectionStart + deltaStart;
+  var end = textarea.selectionEnd + deltaEnd;
+
+  debug('indent', 'delta start: ' + deltaStart + ', delta end: ' + deltaEnd);
+  debug('indent', 'start: ' + textarea.selectionStart + ' -> ' + start);
+  debug('indent', 'end: ' + textarea.selectionEnd + ' -> ' + end);
+
+  textarea.value = util.splice(region.source, region.start, region.length, replacement);
+  textarea.selectionStart = start; // textarea.selectionStart + deltaStart
+  textarea.selectionEnd = end; // textarea.selectionEnd + deltaEnd
+}
+
 function init(form) {
   if (form === null) {
     debug('init', 'comment form not found');
@@ -8652,6 +8712,26 @@ function init(form) {
     }
   });
 
+  // Disable default action bound to Ctrl + (← | →)
+  handle(markdownMsg, 'keydown', function (event) {
+    event.preventDefault();
+  }, {
+    when: function when(event) {
+      // Ctrl + (← | →)
+      return (event.keyCode === 37 || event.keyCode === 39) && event.ctrlKey;
+    }
+  });
+
+  handle(markdownMsg, 'keyup', function (event) {
+    var indent = event.keyCode === 39;
+    indentRegion(markdownMsg, indent);
+  }, {
+    when: function when(event) {
+      // Ctrl + (← | →)
+      return (event.keyCode === 37 || event.keyCode === 39) && event.ctrlKey;
+    }
+  });
+
   // We can't rely on the `submit` event since event listeners
   // are fired (at best) in the order they are attached to the element.
   handle(submit, 'click', convert);
@@ -8670,4 +8750,25 @@ handle(window, 'load', function () {
   log: false
 });
 
-},{"../lib":3,"./config":76,"markdown-it":12}]},{},[77]);
+},{"../lib":3,"./config":76,"./util":78,"markdown-it":12}],78:[function(require,module,exports){
+'use strict';
+
+function splice(str, start, count) {
+  var arr = str.split('');
+
+  for (var _len = arguments.length, replacements = Array(_len > 3 ? _len - 3 : 0), _key = 3; _key < _len; _key++) {
+    replacements[_key - 3] = arguments[_key];
+  }
+
+  arr.splice.apply(arr, [start, count].concat(replacements));
+  return arr.join('');
+}
+
+function truncate(text, width) {
+  return '' + text.slice(0, width) + (text.length > width ? '...' : '');
+}
+
+exports.splice = splice;
+exports.truncate = truncate;
+
+},{}]},{},[77]);

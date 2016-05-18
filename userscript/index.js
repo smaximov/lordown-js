@@ -1,5 +1,7 @@
 const Config = require('./config')
 const lordown = require('../lib')
+const util = require('./util')
+
 const MarkdownIt = require('markdown-it')
 
 const config = new Config
@@ -96,6 +98,60 @@ function setVisible(element, visible) {
   element.style.display = visible ? 'inline-block' : 'none'
 }
 
+function extendedRegion(textarea) {
+  const source = textarea.value
+  let start = textarea.selectionStart
+  let end = textarea.selectionEnd
+
+  while (start > 0 && source[start - 1] !== '\n') --start
+  while (source.length > end && source[end] !== '\n') ++end
+
+  return {
+    start: start,
+    end: end,
+    length: end - start,
+    source: source,
+    text: source.slice(start, end)
+  }
+}
+
+function indentRegion(textarea, indent) {
+  const region = extendedRegion(textarea)
+  debug(indent ? 'indent' : 'unindent',
+        `region [${region.start}, ${region.end}]:\n${util.truncate(region.text, 20)}`)
+
+  let replacement
+  let offset = null
+  let delta = 0
+
+  if (indent) {
+    replacement = region.text.replace(/^/mg, () => {
+      if (offset === null) offset = 4
+      delta += 4
+      return '    '
+    })
+  } else {
+    replacement = region.text.replace(/^( {0,4})/mg, (_match, spaces) => {
+      const length = spaces.length
+
+      if (offset === null) offset = length
+
+      delta += length
+      return ''
+    })
+  }
+
+  const deltaStart = (indent ? 1 : -1) * (offset || 0)
+  const deltaEnd = (indent ? 1 : -1) * delta
+
+  const start = textarea.selectionStart + deltaStart
+  const end = textarea.selectionEnd + deltaEnd
+
+  textarea.value = util.splice(region.source, region.start, region.length, replacement)
+  textarea.selectionStart = start
+  textarea.selectionEnd = end
+}
+
 function init(form) {
   if (form === null) {
     debug('init', 'comment form not found')
@@ -157,6 +213,26 @@ function init(form) {
     when(event) {
       // Ctrl + Enter
       return event.keyCode === 13 && event.ctrlKey
+    }
+  })
+
+  // Disable default action bound to Ctrl + (← | →)
+  handle(markdownMsg, 'keydown', (event) => {
+    event.preventDefault()
+  }, {
+    when(event) {
+      // Ctrl + (← | →)
+      return (event.keyCode === 37 || event.keyCode === 39) && event.ctrlKey
+    }
+  })
+
+  handle(markdownMsg, 'keyup', (event) => {
+    const indent = event.keyCode === 39
+    indentRegion(markdownMsg, indent)
+  }, {
+    when(event) {
+      // Ctrl + (← | →)
+      return (event.keyCode === 37 || event.keyCode === 39) && event.ctrlKey
     }
   })
 
