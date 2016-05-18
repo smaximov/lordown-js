@@ -255,6 +255,11 @@ const css = `
 `
 
 handle(window, 'load', () => {
+  // Expose lordown state
+  window.lordown = {
+    config: config,
+  }
+
   const style = document.createElement('style')
   style.type = 'text/css'
   style.innerHTML = css

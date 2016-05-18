@@ -12,19 +12,19 @@ function parseBool(input) {
 
 class Config {
   get debug() {
-    return Config.bool('lordown.debug', false)
+    return Config.bool('debug', false)
   }
 
   get footnote() {
-    return Config.bool('lordown.footnote', true)
+    return Config.bool('footnote', true)
   }
 
   get footnoteCaption() {
-    return Config.get('lordown.footnote.caption', 'Сноски')
+    return Config.get('footnote.caption', 'Сноски')
   }
 
   get indent() {
-    return Config.bool('lordown.indent', true)
+    return Config.bool('indent', true)
   }
 
   get indentModifier() {
@@ -35,7 +35,7 @@ class Config {
       alt: 'altKey',
     }
 
-    return modMap[Config.get('lordown.indent.modifier', 'ctrl')] || 'ctrlKey'
+    return modMap[Config.get('indent.modifier', 'ctrl')] || 'ctrlKey'
   }
 
   // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Testing_for_support_vs_availability
@@ -55,7 +55,7 @@ class Config {
   static get(key, def=undefined) {
     if (!Config.available) return def
 
-    const value = localStorage.getItem(key)
+    const value = localStorage.getItem(`lordown.${key}`)
     return value === null ? def : value
   }
 

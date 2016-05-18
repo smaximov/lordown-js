@@ -8382,22 +8382,22 @@ var Config = function () {
   _createClass(Config, [{
     key: 'debug',
     get: function get() {
-      return Config.bool('lordown.debug', false);
+      return Config.bool('debug', false);
     }
   }, {
     key: 'footnote',
     get: function get() {
-      return Config.bool('lordown.footnote', true);
+      return Config.bool('footnote', true);
     }
   }, {
     key: 'footnoteCaption',
     get: function get() {
-      return Config.get('lordown.footnote.caption', 'Сноски');
+      return Config.get('footnote.caption', 'Сноски');
     }
   }, {
     key: 'indent',
     get: function get() {
-      return Config.bool('lordown.indent', true);
+      return Config.bool('indent', true);
     }
   }, {
     key: 'indentModifier',
@@ -8409,7 +8409,7 @@ var Config = function () {
         alt: 'altKey'
       };
 
-      return modMap[Config.get('lordown.indent.modifier', 'ctrl')] || 'ctrlKey';
+      return modMap[Config.get('indent.modifier', 'ctrl')] || 'ctrlKey';
     }
 
     // https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API/Using_the_Web_Storage_API#Testing_for_support_vs_availability
@@ -8421,7 +8421,7 @@ var Config = function () {
 
       if (!Config.available) return def;
 
-      var value = localStorage.getItem(key);
+      var value = localStorage.getItem('lordown.' + key);
       return value === null ? def : value;
     }
   }, {
@@ -8756,6 +8756,11 @@ function init(form) {
 var css = '\n.lordown-button {\n  cursor: pointer;\n  margin-left: .5em;\n  text-decoration: underline;\n}\n\n.lordown-button-disabled {\n  text-decoration: line-through;\n}\n';
 
 handle(window, 'load', function () {
+  // Expose lordown state
+  window.lordown = {
+    config: config
+  };
+
   var style = document.createElement('style');
   style.type = 'text/css';
   style.innerHTML = css;
