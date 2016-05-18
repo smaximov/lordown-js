@@ -30,16 +30,3 @@ build:
     - tags
   tags:
     - nodejs
-
-build-tags:
-  stage: build
-  script:
-    - npm run gulp userscript
-  artifacts:
-    name: "lordown-$CI_BUILD_TAG"
-    paths:
-      - dist/lordown.user.js
-  only:
-    - tags
-  tags:
-    - nodejs
