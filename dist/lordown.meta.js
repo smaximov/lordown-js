@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name lordown
 // @description Markdown to LORCODE converter
-// @version 0.7.2
+// @version 0.7.3
 // @grant none
 // @namespace https://www.linux.org.ru
 // @include https://www.linux.org.ru/*

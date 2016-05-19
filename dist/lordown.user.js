@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name lordown
 // @description Markdown to LORCODE converter
-// @version 0.7.2
+// @version 0.7.3
 // @grant none
 // @namespace https://www.linux.org.ru
 // @include https://www.linux.org.ru/*
@@ -8789,6 +8789,16 @@ function init(form) {
     indentRegion(markdownMsg, indent);
   }, {
     when: indentKey
+  });
+
+  handle(markdownMsg, 'keyup', function (event) {
+    event.preventDefault();
+    convert();
+    previewButton.click();
+  }, {
+    when: function when(event) {
+      return event.altKey && event.keyCode == 86; // Alt+v
+    }
   });
 
   // We can't rely on the `submit` event since event listeners

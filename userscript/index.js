@@ -238,6 +238,16 @@ function init(form) {
     when: indentKey,
   })
 
+  handle(markdownMsg, 'keyup', (event) => {
+    event.preventDefault()
+    convert()
+    previewButton.click()
+  }, {
+    when(event) {
+      return event.altKey && event.keyCode == 86 // Alt+v
+    }
+  })
+
   // We can't rely on the `submit` event since event listeners
   // are fired (at best) in the order they are attached to the element.
   handle(submit, 'click', convert)
