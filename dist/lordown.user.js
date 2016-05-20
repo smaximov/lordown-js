@@ -8753,36 +8753,23 @@ function extendedRegion(textarea) {
   };
 }
 
-function indentRegion(textarea, indent) {
+function transformRegion(textarea, re, replace) {
   var region = extendedRegion(textarea);
-  debug(indent ? 'indent' : 'unindent', 'region [' + region.start + ', ' + region.end + ']:\n' + util.truncate(region.text, 20));
 
   var replacement = void 0;
   var offset = null;
   var delta = 0;
 
-  if (indent) {
-    replacement = region.text.replace(/^/mg, function () {
-      if (offset === null) offset = 4;
-      delta += 4;
-      return '    ';
-    });
-  } else {
-    replacement = region.text.replace(/^( {0,4})/mg, function (_match, spaces) {
-      var length = spaces.length;
+  replacement = region.text.replace(re, function () {
+    var result = replace.apply(undefined, arguments);
 
-      if (offset === null) offset = length;
+    if (offset === null) offset = result.delta;
+    delta += result.delta;
+    return result.text;
+  });
 
-      delta += length;
-      return '';
-    });
-  }
-
-  var deltaStart = (indent ? 1 : -1) * (offset || 0);
-  var deltaEnd = (indent ? 1 : -1) * delta;
-
-  var start = textarea.selectionStart + deltaStart;
-  var end = textarea.selectionEnd + deltaEnd;
+  var start = textarea.selectionStart + (offset || 0);
+  var end = textarea.selectionEnd + delta;
 
   textarea.value = util.splice(region.source, region.start, region.length, replacement);
   textarea.selectionStart = start;
@@ -8859,7 +8846,22 @@ function init(form) {
     if (!config.indent) return;
 
     var indent = event.keyCode === 39;
-    indentRegion(markdownMsg, indent);
+
+    if (indent) {
+      transformRegion(markdownMsg, /^/mg, function () {
+        return {
+          text: '    ',
+          delta: 4
+        };
+      });
+    } else {
+      transformRegion(markdownMsg, /^( {0,4})/mg, function (_match, spaces) {
+        return {
+          text: '',
+          delta: -spaces.length
+        };
+      });
+    }
   }, function (event) {
     // [lordown.indent.modifier] + (← | →)
     return (event.keyCode === 37 || event.keyCode === 39) && event[config.indentModifier];

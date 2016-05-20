@@ -150,37 +150,23 @@ function extendedRegion(textarea) {
   }
 }
 
-function indentRegion(textarea, indent) {
+function transformRegion(textarea, re, replace) {
   const region = extendedRegion(textarea)
-  debug(indent ? 'indent' : 'unindent',
-        `region [${region.start}, ${region.end}]:\n${util.truncate(region.text, 20)}`)
 
   let replacement
   let offset = null
   let delta = 0
 
-  if (indent) {
-    replacement = region.text.replace(/^/mg, () => {
-      if (offset === null) offset = 4
-      delta += 4
-      return '    '
-    })
-  } else {
-    replacement = region.text.replace(/^( {0,4})/mg, (_match, spaces) => {
-      const length = spaces.length
+  replacement = region.text.replace(re, (...args) => {
+    const result = replace(...args)
 
-      if (offset === null) offset = length
+    if (offset === null) offset = result.delta
+    delta += result.delta
+    return result.text
+  })
 
-      delta += length
-      return ''
-    })
-  }
-
-  const deltaStart = (indent ? 1 : -1) * (offset || 0)
-  const deltaEnd = (indent ? 1 : -1) * delta
-
-  const start = textarea.selectionStart + deltaStart
-  const end = textarea.selectionEnd + deltaEnd
+  const start = textarea.selectionStart + (offset || 0)
+  const end = textarea.selectionEnd + delta
 
   textarea.value = util.splice(region.source, region.start, region.length, replacement)
   textarea.selectionStart = start
@@ -257,7 +243,22 @@ function init(form) {
     if (!config.indent) return
 
     const indent = event.keyCode === 39
-    indentRegion(markdownMsg, indent)
+
+    if (indent) {
+      transformRegion(markdownMsg, /^/mg, () => {
+        return {
+          text: '    ',
+          delta: 4,
+        }
+      })
+    } else {
+      transformRegion(markdownMsg, /^( {0,4})/mg, (_match, spaces) => {
+        return {
+          text: '',
+          delta: -spaces.length,
+        }
+      })
+    }
   }, (event) => {
     // [lordown.indent.modifier] + (← | →)
     return (event.keyCode === 37 || event.keyCode === 39) && event[config.indentModifier]
