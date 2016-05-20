@@ -1,6 +1,6 @@
 {
   "name": "lordown",
-  "version": "0.7.3",
+  "version": "0.7.4",
   "description": "Markdown to LORCODE converter",
   "main": "./lib/index.js",
   "scripts": {

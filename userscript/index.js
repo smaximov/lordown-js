@@ -261,7 +261,33 @@ function init(form) {
     }
   }, (event) => {
     // [lordown.indent.modifier] + (← | →)
-    return (event.keyCode === 37 || event.keyCode === 39) && event[config.indentModifier]
+    return (event.keyCode === 37 || event.keyCode === 39) && event[config.indentModifier] &&
+      // exactly one modifier key is pressed
+      (event.ctrlKey + event.altKey + event.shiftKey === 1)
+  })
+
+  // Handle quote/unquote
+  keyHandler.handle((event) => {
+    const quote = event.keyCode === 39
+    if (quote) {
+      transformRegion(markdownMsg, /^/mg, () => {
+        return {
+          text: '>',
+          delta: 1,
+        }
+      })
+    } else {
+      transformRegion(markdownMsg, /^(\s*>)/mg, (_match, quote) => {
+        return {
+          text: '',
+          delta: -quote.length
+        }
+      })
+    }
+  }, (event) => {
+    // Ctrl + Alt + (← | →)
+    return (event.keyCode === 37 || event.keyCode === 39) &&
+      event.altKey && event.ctrlKey
   })
 
   // Handle Alt+V (preview)

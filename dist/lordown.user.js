@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name lordown
 // @description Markdown to LORCODE converter
-// @version 0.7.3
+// @version 0.7.4
 // @grant none
 // @namespace https://www.linux.org.ru
 // @include https://www.linux.org.ru/*
@@ -8864,7 +8864,32 @@ function init(form) {
     }
   }, function (event) {
     // [lordown.indent.modifier] + (← | →)
-    return (event.keyCode === 37 || event.keyCode === 39) && event[config.indentModifier];
+    return (event.keyCode === 37 || event.keyCode === 39) && event[config.indentModifier] &&
+    // exactly one modifier key is pressed
+    event.ctrlKey + event.altKey + event.shiftKey === 1;
+  });
+
+  // Handle quote/unquote
+  keyHandler.handle(function (event) {
+    var quote = event.keyCode === 39;
+    if (quote) {
+      transformRegion(markdownMsg, /^/mg, function () {
+        return {
+          text: '>',
+          delta: 1
+        };
+      });
+    } else {
+      transformRegion(markdownMsg, /^(\s*>)/mg, function (_match, quote) {
+        return {
+          text: '',
+          delta: -quote.length
+        };
+      });
+    }
+  }, function (event) {
+    // Ctrl + Alt + (← | →)
+    return (event.keyCode === 37 || event.keyCode === 39) && event.altKey && event.ctrlKey;
   });
 
   // Handle Alt+V (preview)
