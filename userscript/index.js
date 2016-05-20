@@ -67,6 +67,41 @@ function clone(node, updateAttr={}) {
   return result
 }
 
+class KeyboardEventDispatcher {
+  constructor(element) {
+    this.element = element
+    this.handlers = []
+
+    handle(this.element, 'keydown', (event) => {
+      for (let handler of this.handlers) {
+        if (handler.when(event)) {
+          event.preventDefault()
+          return
+        }
+      }
+    }, {
+      log: false
+    })
+
+    handle(this.element, 'keyup', (event) => {
+      for (let handler of this.handlers) {
+        if (handler.when(event)) {
+          handler.run(event)
+        }
+      }
+    }, {
+      log: false
+    })
+  }
+
+  handle(handler, when) {
+    this.handlers.push({
+      run: handler,
+      when: when,
+    })
+  }
+}
+
 class ToggleButton {
   constructor(initialState, caption, onToggle) {
     this._enabled = initialState
@@ -205,47 +240,35 @@ function init(form) {
 
   const submit = form.querySelector('button:not(name)')
 
-  handle(markdownMsg, 'keydown', () => {
-    // Cloning an element discards its event listeners,
-    // so we are going to trigger `submit` manually via `click`.
+  const keyHandler = new KeyboardEventDispatcher(markdownMsg)
+
+  // Handle Ctrl+Enter (submit)
+  // Cloning an element discards its event listeners,
+  // so we are going to trigger `submit` manually via `click`.
+  keyHandler.handle(() => {
     submit.click()
-  }, {
-    when(event) {
-      // Ctrl + Enter
-      return event.keyCode === 13 && event.ctrlKey
-    }
+  }, (event) => {
+    // Ctrl + Enter
+    return event.keyCode === 13 && event.ctrlKey
   })
 
-  // [lordown.indent.modifier] + (← | →)
-  const indentKey = (e) => (e.keyCode === 37 || e.keyCode === 39) && e[config.indentModifier]
-
-  handle(markdownMsg, 'keydown', (event) => {
+  // Handle indent/unindent
+  keyHandler.handle((event) => {
     if (!config.indent) return
 
-    // Disable default action bound to [lordown.indent.modifier] + (← | →)
-    event.preventDefault()
-  }, {
-    when: indentKey,
-  })
-
-  handle(markdownMsg, 'keyup', (event) => {
-    if (!config.indent) return
-
-    // Handle indent/unindent
     const indent = event.keyCode === 39
     indentRegion(markdownMsg, indent)
-  }, {
-    when: indentKey,
+  }, (event) => {
+    // [lordown.indent.modifier] + (← | →)
+    return (event.keyCode === 37 || event.keyCode === 39) && event[config.indentModifier]
   })
 
-  handle(markdownMsg, 'keyup', (event) => {
-    event.preventDefault()
+  // Handle Alt+V (preview)
+  keyHandler.handle(() => {
     convert()
     previewButton.click()
-  }, {
-    when(event) {
-      return event.altKey && event.keyCode == 86 // Alt+v
-    }
+  }, (event) => {
+    return event.altKey && event.keyCode == 86 // Alt+V
   })
 
   // We can't rely on the `submit` event since event listeners

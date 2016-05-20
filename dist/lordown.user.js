@@ -8607,9 +8607,95 @@ function clone(node) {
   return result;
 }
 
+var KeyboardEventDispatcher = function () {
+  function KeyboardEventDispatcher(element) {
+    var _this = this;
+
+    _classCallCheck(this, KeyboardEventDispatcher);
+
+    this.element = element;
+    this.handlers = [];
+
+    handle(this.element, 'keydown', function (event) {
+      var _iteratorNormalCompletion2 = true;
+      var _didIteratorError2 = false;
+      var _iteratorError2 = undefined;
+
+      try {
+        for (var _iterator2 = _this.handlers[Symbol.iterator](), _step2; !(_iteratorNormalCompletion2 = (_step2 = _iterator2.next()).done); _iteratorNormalCompletion2 = true) {
+          var handler = _step2.value;
+
+          if (handler.when(event)) {
+            event.preventDefault();
+            return;
+          }
+        }
+      } catch (err) {
+        _didIteratorError2 = true;
+        _iteratorError2 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion2 && _iterator2.return) {
+            _iterator2.return();
+          }
+        } finally {
+          if (_didIteratorError2) {
+            throw _iteratorError2;
+          }
+        }
+      }
+    }, {
+      log: false
+    });
+
+    handle(this.element, 'keyup', function (event) {
+      var _iteratorNormalCompletion3 = true;
+      var _didIteratorError3 = false;
+      var _iteratorError3 = undefined;
+
+      try {
+        for (var _iterator3 = _this.handlers[Symbol.iterator](), _step3; !(_iteratorNormalCompletion3 = (_step3 = _iterator3.next()).done); _iteratorNormalCompletion3 = true) {
+          var handler = _step3.value;
+
+          if (handler.when(event)) {
+            handler.run(event);
+          }
+        }
+      } catch (err) {
+        _didIteratorError3 = true;
+        _iteratorError3 = err;
+      } finally {
+        try {
+          if (!_iteratorNormalCompletion3 && _iterator3.return) {
+            _iterator3.return();
+          }
+        } finally {
+          if (_didIteratorError3) {
+            throw _iteratorError3;
+          }
+        }
+      }
+    }, {
+      log: false
+    });
+  }
+
+  _createClass(KeyboardEventDispatcher, [{
+    key: 'handle',
+    value: function handle(handler, when) {
+      this.handlers.push({
+        run: handler,
+        when: when
+      });
+    }
+  }]);
+
+  return KeyboardEventDispatcher;
+}();
+
 var ToggleButton = function () {
   function ToggleButton(initialState, caption, onToggle) {
-    var _this = this;
+    var _this2 = this;
 
     _classCallCheck(this, ToggleButton);
 
@@ -8619,9 +8705,9 @@ var ToggleButton = function () {
     this._element.classList.add('lordown-button');
 
     handle(this._element, 'click', function () {
-      _this._enabled = !_this._enabled;
-      _this._element.classList.toggle('lordown-button-disabled');
-      onToggle(_this._enabled);
+      _this2._enabled = !_this2._enabled;
+      _this2._element.classList.toggle('lordown-button-disabled');
+      onToggle(_this2._enabled);
     });
   }
 
@@ -8756,49 +8842,35 @@ function init(form) {
 
   var submit = form.querySelector('button:not(name)');
 
-  handle(markdownMsg, 'keydown', function () {
-    // Cloning an element discards its event listeners,
-    // so we are going to trigger `submit` manually via `click`.
+  var keyHandler = new KeyboardEventDispatcher(markdownMsg);
+
+  // Handle Ctrl+Enter (submit)
+  // Cloning an element discards its event listeners,
+  // so we are going to trigger `submit` manually via `click`.
+  keyHandler.handle(function () {
     submit.click();
-  }, {
-    when: function when(event) {
-      // Ctrl + Enter
-      return event.keyCode === 13 && event.ctrlKey;
-    }
+  }, function (event) {
+    // Ctrl + Enter
+    return event.keyCode === 13 && event.ctrlKey;
   });
 
-  // [lordown.indent.modifier] + (← | →)
-  var indentKey = function indentKey(e) {
-    return (e.keyCode === 37 || e.keyCode === 39) && e[config.indentModifier];
-  };
-
-  handle(markdownMsg, 'keydown', function (event) {
+  // Handle indent/unindent
+  keyHandler.handle(function (event) {
     if (!config.indent) return;
 
-    // Disable default action bound to [lordown.indent.modifier] + (← | →)
-    event.preventDefault();
-  }, {
-    when: indentKey
-  });
-
-  handle(markdownMsg, 'keyup', function (event) {
-    if (!config.indent) return;
-
-    // Handle indent/unindent
     var indent = event.keyCode === 39;
     indentRegion(markdownMsg, indent);
-  }, {
-    when: indentKey
+  }, function (event) {
+    // [lordown.indent.modifier] + (← | →)
+    return (event.keyCode === 37 || event.keyCode === 39) && event[config.indentModifier];
   });
 
-  handle(markdownMsg, 'keyup', function (event) {
-    event.preventDefault();
+  // Handle Alt+V (preview)
+  keyHandler.handle(function () {
     convert();
     previewButton.click();
-  }, {
-    when: function when(event) {
-      return event.altKey && event.keyCode == 86; // Alt+v
-    }
+  }, function (event) {
+    return event.altKey && event.keyCode == 86; // Alt+V
   });
 
   // We can't rely on the `submit` event since event listeners
